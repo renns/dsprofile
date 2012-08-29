@@ -34,7 +34,6 @@ Download and install the Scala simple build tool:
 
     https://github.com/harrah/xsbt/wiki/
 
-We have tested the build with sbt 0.12.0.
 
 Run `sbt package` in the top-level of the project. sbt will download all the
 necessary Scala compiler and library jars, build the library, and package it
@@ -44,6 +43,9 @@ If all goes well, you should find the dsprofile library jar in the `target`
 directory under a sub-directory for the Scala version that is being used.
 E.g., if the Scala version is 2.10, look in `target/scala_2.10` for
 `dsprofile_2.10-VERSION.jar` where `VERSION` is the dsprofile library version.
+
+Version 0.1.0 has been tested with sbt 0.12.0, Scala 2.10.0-M7 and Java
+1.7.0_06 running on Mac OS X 10.8.1.
 
 Using the library from Scala
 ============================
