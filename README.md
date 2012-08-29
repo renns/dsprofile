@@ -2,7 +2,7 @@ The dsprofile library
 =====================
 
 The dsprofile library provides general facilities to implement domain-specific
-profiling in Scala programs.
+profiling in Scala and Java programs.
 
 The design of the library and an application to attribute grammar profiling
 are described in "Profile-based Abstraction and Analysis of Attribute
