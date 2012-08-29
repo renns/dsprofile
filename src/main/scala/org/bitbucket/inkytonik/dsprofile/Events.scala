@@ -77,31 +77,13 @@ object Events {
     /**
      * Base class of profiling events.
      */
-    abstract class Event {
-
-
-        /**
-         * The kind of this event.
-         */
-        def kind : EventKind
+    class Event (val kind : EventKind, dimPairs : DimPair*) {
 
         /**
-         * The dimensions that are used as this event's id.
+         * The dimensions of this event.
          */
-        def id : Dimensions
-
-        /**
-         * The extra dimensions which do not contribute to this event's id, but
-         * are available for use in summaries and reports.
-         */
-        def extras : Dimensions
-
-        /**
-         * All of the dimensions of this event, just bringing all `id` and
-         * `extras` dimensions together into a map.
-         */
-        def dimensions : Dimensions =
-            id ++ extras
+        val dimensions : Dimensions =
+            Map (dimPairs : _*)
 
         /**
          * The time in milliseconds when this event was created.
@@ -123,39 +105,21 @@ object Events {
     }
 
     /**
-     * Generate an event by adding it to the event buffer. The event will
-     * not be time-stamped until it is added.
+     * Generate a `Start` event with the given dimensions.
      */
     @inline
-    def generate (event : => Event) {
-        events += event
+    def start (dimPairs : DimPair*) {
+        if (profiling)
+            events += new Event (Start, dimPairs : _*)
     }
 
     /**
-     * Generate a `Start` event with the given id. The extra dimensions 
-     * will be empty.
+     * Generate a `Finish` event with the given dimensions.
      */
     @inline
-    def start (idPairs : DimPair*) {
+    def finish (dimPairs : DimPair*) {
         if (profiling)
-            generate (new Event {
-                          val kind = Start
-                          val id = Map (idPairs : _*)
-                          val extras = emptyDimensions
-                      })
-    }
-
-    /**
-     * Generate a `Finish` event with the given type, id and extras.
-     */
-    @inline
-    def finish (idPairs : DimPair*) (extrasPairs : DimPair*) {
-        if (profiling)
-            generate (new Event {
-                          val kind = Finish
-                          val id = Map (idPairs : _*)
-                          val extras = Map (extrasPairs : _*)
-                      })
+            events += new Event (Finish, dimPairs : _*)
     }
 
 }

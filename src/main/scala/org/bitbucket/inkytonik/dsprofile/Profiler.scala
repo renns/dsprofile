@@ -44,39 +44,38 @@ trait Profiler extends Values {
      * interpreted as a colon-separated list of dimension names. The list of
      * names is returned.
      */
-    def parseProfileOption (value : String) : List[Dimension] =
-        value.split (":").toList
+    def parseProfileOption (value : String) : Seq[Dimension] =
+        value.split (":").toSeq
 
     /**
-     * Return whether two events have the same identifiers or not. Same in this
-     * case means the `id` dimensions have the same name and values. Values are
-     * compared by casting to `AnyRef` and then using reference equality.
+     * Return whether event `e2` has a superset of the dimensions of `e1` and
+     * the same values for those dimensions. In effect, the `e1` dimensions are
+     * treated as an identifier and we check to see that `e2` has the same 
+     * identifier. Values are compared by casting to `AnyRef` and then using 
+     * reference equality.
      */
     def equalIds (e1 : Event, e2 : Event) : Boolean = {
-        val id1 = e1.id
-        val id2 = e2.id
-        if (id1.size == id2.size)
-            id1.forall {
-                case (k, v) =>
-                    (id2 contains k) && (
-                        (id1 (k), id2 (k)) match {
-                            case (r1 : AnyRef, r2 : AnyRef) =>
-                                r1 eq r2
-                            case (v1, v2) =>
-                                sys.error ("equalIds: comparison case reached for " +
-                                           v1 + " " + v2)
-                        }
-                    )
-            }
-        else
-            false
+        val dims1 = e1.dimensions
+        val dims2 = e2.dimensions
+        dims1.forall {
+            case (k, v) =>
+                (dims2 contains k) && (
+                    (dims1 (k), dims2 (k)) match {
+                        case (r1 : AnyRef, r2 : AnyRef) =>
+                            r1 eq r2
+                        case (v1, v2) =>
+                            sys.error ("equalIds: comparison case reached for " +
+                                       v1 + " " + v2)
+                    }
+                )
+        }
     }
 
     /**
      * Run a computation under the control of the profiler. Print the requested
      * reports and return the value of the computation.
      */
-    def profileReports[T] (computation : => T, dimensionNames : List[Dimension]) : T = {
+    def profileReports[T] (computation : => T, dimensionNames : Seq[Dimension]) : T = {
 
         import scala.collection.mutable.Stack
 
@@ -117,7 +116,7 @@ trait Profiler extends Values {
                                    e.kind + " " + e.dimensions)
                     val es = startStack.pop ()
                     es.kind match {
-                        case Start if equalIds (e, es) =>
+                        case Start if equalIds (es, e) =>
                             val dirDescs = dirDescsStack.pop ().result ()
                             val allDescs = allDescsStack.pop ().result ()
                             val dtime = allDescs.map (_.stime).sum
@@ -149,7 +148,7 @@ trait Profiler extends Values {
     /**
      * Profile `computation` along the given dimensions.
      */
-    def profile[T] (computation : => T, dimensionNames : List[Dimension]) : T = {
+    def profile[T] (computation : => T, dimensionNames : Dimension*) : T = {
         Events.profiling = true
         val t = profileReports (computation, dimensionNames)
         Events.profiling = false
@@ -248,7 +247,7 @@ trait Profiler extends Values {
      * FIXME: take into account multiple record types, we now assume attreval only
      * FIXME: avoid multiple passes through the data?
      */
-    def printReports (totalTime : Long, dimensionNames : List[Dimension], records : List[Record]) {
+    def printReports (totalTime : Long, dimensionNames : Seq[Dimension], records : List[Record]) {
         if (dimensionNames.nonEmpty) {
 
             val nrecords = records.length
@@ -269,13 +268,14 @@ trait Profiler extends Values {
             summariseAlongDims (dimensionNames, records, nrecords, profiledTime)
 
             finishReport ()
+
         }
     }
 
     /**
      * Summarise attribute evaluations along a list of dimensions.
      */
-    def summariseAlongDims (dimensionNames : List[Dimension], records : List[Record],
+    def summariseAlongDims (dimensionNames : Seq[Dimension], records : List[Record],
                             nrecords : Int, profiledTime : Long) {
         
         import java.util.IdentityHashMap
@@ -485,7 +485,7 @@ trait Profiler extends Values {
             buckets
         }
 
-        def aggregateAndPrintAll (dimcount : Int, dimensionNames : List[Dimension],
+        def aggregateAndPrintAll (dimcount : Int, dimensionNames : Seq[Dimension],
                                   records : List[Record], value : String = "") {
             val dimension = dimensionNames.head
             val buckets = aggregateAndPrint (dimension, records, value)

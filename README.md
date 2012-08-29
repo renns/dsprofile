@@ -9,24 +9,30 @@ are described in "Profile-based Abstraction and Analysis of Attribute
 Grammars" by Anthony M. Sloane, Proceedings of the International Conference on
 Software Language Engineering, 2012.
 
+Downloading the library
+=======================
+
+Pre-built jar files for the library are available via the Download section of
+this site.
+
+We expect to publish the library in the Maven Central repository at some
+point.
+
 Building the library
 ====================
 
-Currently the library is not distributed via any repositories and we do not
-upload pre-built jars.
+Using a pre-built jar file should be sufficient, but if you want to build
+the library, first clone this repository using Mercurial.
 
-So, if you want to use it, you will need to build it. First, clone this
-repository using Mercurial.
-
-Then, download and install the Scala simple build tool:
+Download and install the Scala simple build tool:
 
     https://github.com/harrah/xsbt/wiki/
 
 We have tested the build with sbt 0.12.0.
 
-Finally, run `sbt package` in the top-level of the project. sbt will download
-all the necessary Scala compiler and library jars, build the library, and
-package it as a jar file.
+Run `sbt package` in the top-level of the project. sbt will download all the
+necessary Scala compiler and library jars, build the library, and package it
+as a jar file.
 
 If all goes well, you should find the dsprofile library jar in the `target`
 directory under a sub-directory for the Scala version that is being used.
@@ -68,26 +74,28 @@ arbitrary objects as far as the profiling library is concerned. However, it is
 best to make sure that they have a sensible `toString` implementation, since
 that method is used by the library to print the values (see below).
 
-At the point when an interesting execution region has completed, the
-program code should call the `Events.finish` method. This method has
-two parameter lists. The first one should be given the same information
-as the corresponding `start` event. The library uses this list to 
-make sure that the `start` and `finish` attributes are properly nested.
-The second parameter list can contain other dimensions and values that
-are only known once the evaluation has finished.
+At the point when an interesting execution region has completed, the program
+code should call the `Events.finish` method. As for the `start` method, the
+`finish` method takes as its parameters the dimensions of the event that has
+just finished. The finish call must have at least the same dimensions (and
+values) as the corresponding `start` call, since the library uses this
+information to check that the calls are properly nested. The `finish` call can
+have extra dimensions, which are usually used to pass information that is only
+known once the evaluation has finished.
 
 For example, in the attribute evaluation case, we might call `finish`
 as follows.
 
     finish ("event" -> "AttrEval", "subject" -> s, "attribute" -> a,
-            "parameter" -> None) ("value" -> v, "cached" -> false)
+            "parameter" -> None, "value" -> v, "cached" -> false)
 
-We can see that the first parameter list is the same in the `start` call. In
-addition, the new `"value"` and `"cached"` dimensions are given values here,
-because we only know what they are once the attribute occurrence has been
-fully evaluated. As before, the value `v` is an arbitrary object that is the
-attribute value. The `cached` dimension is a Boolean that indicates whether
-the value of the attribute was obtained from its cache or not.
+We can see that the first part of the parameter list is the same in the
+`start` call. In addition, the new `"value"` and `"cached"` dimensions are
+given values here, because we only know what they are once the attribute
+occurrence has been fully evaluated. As before, the value `v` is an arbitrary
+object that is the attribute value. The `cached` dimension is a Boolean that
+indicates whether the value of the attribute was obtained from its cache or
+not.
 
 The other main entry point for the library is the `Profiler.profile` method.
 It should be called with the first argument being the computation that you
@@ -97,10 +105,11 @@ and `finish` methods as described above, but it can do any other computation
 as well. The second argument to `profile` is a list of the dimensions that you
 want to see in the profile report. For example, we might call
 
-    profile (c, List ("attribute", "cached"))
+    profile (c, "attribute", "cached")
 
-to profile the evaluation of `c` and print a report along two dimensions,
-first the attribute that was evaluated and then whether it was cached or not.
+to profile the evaluation of `c` and print a report along two dimensions
+(first the attribute that was evaluated and then whether it was cached or
+not).
 
 The first part of a report produced by this call is:
 
@@ -166,6 +175,95 @@ might be printed in full or pretty-printed.
 Using the library from Java
 ===========================
 
-In theory Java code should be able to call into the Scala code. We will
-document this pathway more in future once we have more experience with it. We
-expect to use that experience to provide a more convenient interface for Java.
+The dsprofile library can also be used from Java code. To make this more 
+convenient, some bridge types and methods are used to communicate with 
+the library implementation in Scala.
+
+The following code shows a simple Java program and how the profiler can be
+used from it using these bridges.
+
+    import org.bitbucket.inkytonik.dsprofile.Action;
+    import org.bitbucket.inkytonik.dsprofile.JavaProfiler;
+    
+    public class Program extends JavaProfiler {
+    
+        public static void main (String[] args) {
+    
+            Action action =
+                new Action () {
+                    public void execute () {
+                        doSomething (10);
+                    }
+                };
+    
+            profile (action, "foo", "bar");
+    
+        }
+    
+        static void doSomething (int num) {
+            start (tuple ("event", "something"),
+                   tuple ("foo", num),
+                   tuple ("bar", num * 2));
+            int x = 0;
+            for (int i = 0; i < 100000; i++)
+                x = x + i;
+            System.out.println ("x = " + x);
+            if (num > 1)
+                doSomething (num - 1);
+            finish (tuple ("event", "something"),
+                    tuple ("foo", num),
+                    tuple ("bar", num * 2),
+                    tuple ("ble", num + 1));
+        }
+    
+    }
+
+The `Action` type is needed since evaluation of  the first parameter to
+`profile` must be delayed rather than occurring before the call. THe
+`tuple` calls are used to create Scala tuples for the pairs of dimension
+name and value.
+
+The beginning part of the output produced by this program is as follows:
+
+    x = 704982704
+    x = 704982704
+    x = 704982704
+    x = 704982704
+    x = 704982704
+    x = 704982704
+    x = 704982704
+    x = 704982704
+    x = 704982704
+    x = 704982704
+    
+        36 ms total time
+        20 ms profiled time (57.1%)
+        10 profile records
+    
+    By foo:
+    
+     Total Total  Self  Self  Desc  Desc Count Count
+        ms     %    ms     %    ms     %           %
+        20 100.0     3  15.2    17  84.8     1  10.0  10
+        17  84.8     3  17.9    13  66.9     1  10.0  9
+        13  66.9     3  18.0    10  48.8     1  10.0  8
+        10  48.8     2  13.3     7  35.5     1  10.0  7
+         7  35.5     3  15.2     4  20.3     1  10.0  6
+         4  20.3     0   0.9     4  19.5     1  10.0  5
+         4  19.5     0   0.7     3  18.8     1  10.0  4
+         3  18.8     0   0.7     3  18.1     1  10.0  3
+         3  18.1     0   0.9     3  17.2     1  10.0  2
+         3  17.2     3  17.2     0   0.0     1  10.0  1
+    
+    By bar for 10:
+    
+     Total Total  Self  Self  Desc  Desc Count Count
+        ms     %    ms     %    ms     %           %
+        20 100.0     3  15.2    17  84.8     1  10.0  20
+    
+    By bar for 9:
+    
+     Total Total  Self  Self  Desc  Desc Count Count
+        ms     %    ms     %    ms     %           %
+        17  84.8     3  17.9    13  66.9     1  10.0  18
+

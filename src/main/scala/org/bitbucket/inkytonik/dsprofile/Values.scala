@@ -64,12 +64,13 @@ trait Values {
             "unknown dimension \"" + dim + "\""
 
     /**
-     * Check the type of a record by looking for its `type` intrinsic dimension
-     * and comparing to `tipe`. Return true if it is of the given type, false
-     * otherwise.
+     * Check the event type of a record by looking for its `event` intrinsic
+     * dimension and comparing to the given `event` string. Return true if
+     * it is of the given event type, false otherwise.
      */
-    def isOfType (record : Record, tipe : String) : Boolean =
-       (record.dimensions contains "type") && (record.dimensions ("type") == tipe)
+    def isEventType (record : Record, eventtype : String) : Boolean =
+        (record.dimensions contains "event") &&
+            (record.dimensions ("event") == eventtype)
     
     /**
      * Check for an intrinsic dimension `needed` on `record`, while looking for
@@ -77,20 +78,21 @@ trait Values {
      * and pass it to `f`, using the `f`'s return value as the value of the `dim`
      * dimension. Otherwise, use `error` to report the missing dimension.
      */
-    def checkFor (record : Record, dim : Dimension, tipe : String,
+    def checkFor (record : Record, dim : Dimension, eventtype : String,
                   needed : Dimension) (f : Value => Value) : Value =
-        if (record.dimensions contains "type")
-            if (record.dimensions ("type") == tipe)
+        if (record.dimensions contains "event")
+            if (record.dimensions ("event") == eventtype)
                 if (record.dimensions contains needed)
                     f (record.dimensions (needed))
                 else
-                    "\"" + needed + "\" dimension not available in \"" + tipe +
-                        "\" event, so \"" + dim + "\" cannot be derived"
+                    "\"" + needed + "\" dimension not available in \"" +
+                        eventtype + "\" event, so \"" + dim +
+                        "\" cannot be derived"
             else
-                "record is not of type \"" + tipe + "\", so \"" + dim +
-                    "\" cannot be derived from \"" + needed + "\""
+                "record is not of event \"" + eventtype + "\", so \"" +
+                    dim + "\" cannot be derived from \"" + needed + "\""
         else
-            "record does not have \"type\" dimension, so \"" + dim +
+            "record does not have \"event\" dimension, so \"" + dim +
                 "\" cannot be derived from \"" + needed + "\""
 
     /**
@@ -116,7 +118,7 @@ trait Values {
      * method does nothing. The method is passed the dimension names that
      * have been requested so that can react to them.
      */
-    def startReport (dimensionNames : List[Dimension]) {
+    def startReport (dimensionNames : Seq[Dimension]) {
         // Do nothing
     }
 
