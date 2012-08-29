@@ -9,6 +9,12 @@ are described in "Profile-based Abstraction and Analysis of Attribute
 Grammars" by Anthony M. Sloane, Proceedings of the International Conference on
 Software Language Engineering, 2012.
 
+The construction of this library was supported by Macquarie University and
+Eindhoven University of Technology.
+
+The library is released under the GNU Lesser General Public License. See the
+files `COPYING` and `COPYING.LESSER` for details.
+
 Downloading the library
 =======================
 
