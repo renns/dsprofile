@@ -8,9 +8,9 @@ organization := "org.bitbucket.inkytonik.dsprofile"
 
 // Scala compiler settings
 
-scalaVersion := "2.10.0-RC1"
+scalaVersion := "2.10.0-RC3"
 
-scalaBinaryVersion := "2.10.0-RC1"
+scalaBinaryVersion := "2.10.0-RC3"
 
 scalacOptions ++= Seq ("-deprecation", "-feature", "-unchecked")
 
@@ -26,7 +26,7 @@ scalacOptions ++= Seq ("-deprecation", "-feature", "-unchecked")
 
 logLevel := Level.Info
 
-shellPrompt <<= (name, version) { (n, v) => 
+shellPrompt <<= (name, version) { (n, v) =>
      _ => n + " " + v + "> "
 }
 
@@ -41,9 +41,9 @@ mainClass := None
 // FIXME
 // scalacOptions in (Compile, doc) <++= baseDirectory map {
 //     bd => Seq (
-//         "-sourcepath", 
-//             bd.getAbsolutePath, 
-//         "-doc-source-url", 
+//         "-sourcepath",
+//             bd.getAbsolutePath,
+//         "-doc-source-url",
 //             "https://code.google.com/p/kiama/source/browse€{FILE_PATH}.scala"
 //     )
 // }
@@ -54,23 +54,23 @@ mainClass := None
 // publishTo <<= version { v =>
 //     val nexus = "https://oss.sonatype.org/"
 //     if (v.trim.endsWith ("SNAPSHOT"))
-//         Some ("snapshots" at nexus + "content/repositories/snapshots") 
+//         Some ("snapshots" at nexus + "content/repositories/snapshots")
 //     else
 //         Some ("releases" at nexus + "service/local/staging/deploy/maven2")
 // }
-// 
+//
 // publishMavenStyle := true
-// 
+//
 // publishArtifact in Test := true
-// 
+//
 // pomIncludeRepository := { x => false }
-// 
+//
 // pomExtra := (
 //     <url>http://kiama.googlecode.com</url>
 //     <licenses>
 //         <license>
 //             <name>LGPL 3.0 license</name>
-//             <url>http://www.opensource.org/licenses/lgpl-3.0.html</url>        
+//             <url>http://www.opensource.org/licenses/lgpl-3.0.html</url>
 //             <distribution>repo</distribution>
 //         </license>
 //     </licenses>
