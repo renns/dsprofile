@@ -30,6 +30,8 @@ trait Profiler extends Values {
     import scala.collection.mutable.{HashMap, HashSet, ListBuffer}
     import scala.math.{pow, sqrt}
 
+    var startTime = nanoTime
+
     /**
      * Return true if the profile tables should include timings.
      * Default: yes.
@@ -76,15 +78,25 @@ trait Profiler extends Values {
      * reports and return the value of the computation.
      */
     def profileReports[T] (computation : => T, dimensionNames : Seq[Dimension]) : T = {
+        startItUp()
+        val computedResult = computation
+        shutItDown(dimensionNames)
+        computedResult
+    }
 
-        import scala.collection.mutable.Stack
-
+    def startItUp(): Unit = {
+        Events.profiling = true
         // Clear the event buffer
         Events.reset ()
 
-        // Run the computation, collecting the total time taken
-        val startTime = nanoTime
-        val computedResult = computation
+        startTime = nanoTime
+    }
+
+    def shutItDown(dimensionNames: Seq[Dimension]): Unit = {
+        import scala.collection.mutable.Stack
+
+        Events.profiling = false
+
         val totalTime = nanoTime - startTime
 
         // Get the final collection of events
@@ -140,19 +152,13 @@ trait Profiler extends Values {
         // Print the reports
         printReports (totalTime, dimensionNames, records)
 
-        // Return the result of the computation
-        computedResult
-
     }
 
     /**
      * Profile `computation` along the given dimensions.
      */
     def profile[T] (computation : => T, dimensionNames : Dimension*) : T = {
-        Events.profiling = true
-        val t = profileReports (computation, dimensionNames)
-        Events.profiling = false
-        t
+        profileReports (computation, dimensionNames)
     }
     
     /**

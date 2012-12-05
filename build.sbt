@@ -8,9 +8,9 @@ organization := "org.bitbucket.inkytonik.dsprofile"
 
 // Scala compiler settings
 
-scalaVersion := "2.10.0-RC1"
+scalaVersion := "2.10.0-RC3"
 
-scalaBinaryVersion := "2.10.0-RC1"
+scalaBinaryVersion := "2.10.0-RC3"
 
 scalacOptions ++= Seq ("-deprecation", "-feature", "-unchecked")
 
@@ -30,9 +30,27 @@ shellPrompt <<= (name, version) { (n, v) =>
      _ => n + " " + v + "> "
 }
 
+
+libraryDependencies <++= scalaVersion {
+    version =>
+        Seq ( "org.scalatest" %% "scalatest" % "2.0.M5-B1" % "test"
+            )
+}
+
 // No main class since dsprofile is a library
 
 mainClass := None
+
+scalaSource in Compile <<= baseDirectory { _ / "src" }
+
+scalaSource in Test <<= scalaSource in Compile
+
+unmanagedSources in Compile <<=
+    (scalaSource in Compile, unmanagedSources in Test) map { (s, tests) =>
+        ((s ** "*.scala") --- tests).get
+    }
+
+parallelExecution in Test := false
 
 // Documentation
 
