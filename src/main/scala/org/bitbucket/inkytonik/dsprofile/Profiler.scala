@@ -78,9 +78,9 @@ trait Profiler extends Values {
      * reports and return the value of the computation.
      */
     def profileReports[T] (computation : => T, dimensionNames : Seq[Dimension]) : T = {
-        startItUp()
+        profileStart()
         val computedResult = computation
-        shutItDown(dimensionNames)
+        profileStop(dimensionNames)
         computedResult
     }
 

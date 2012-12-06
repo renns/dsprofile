@@ -16,14 +16,14 @@ class ProfilerTests extends Profiler
 
   before {
     otp = ""
-    startItUp()
+    profileStart()
     start("won" -> 1, "too" -> 2)
     Thread.sleep(250)
     finish("won" -> 1, "too" -> 2)
     start("won" -> 10, "too" -> 20)
     Thread.sleep(250)
     finish("won" -> 10, "too" -> 20)
-    shutItDown(Seq("won"))
+    profileStop(Seq("won"))
   }
 
   after {
@@ -35,8 +35,8 @@ class ProfilerTests extends Profiler
   }
 
   test ("check result") {
-    otp should include regex """25\d\s+50\.0\s+25\d\s+50\.0\s+0\s+0\.0\s+1\s+50\.0\s+10""".r
-    otp should include regex """25\d\s+50\.0\s+25\d\s+50\.0\s+0\s+0\.0\s+1\s+50\.0\s+1""".r
+    otp should include regex """25\d\s+50\.\d\s+25\d\s+50\.\d\s+0\s+0\.0\s+1\s+50\.\d\s+10""".r
+    otp should include regex """25\d\s+50\.\d\s+25\d\s+50\.\d\s+0\s+0\.0\s+1\s+50\.\d\s+1""".r
   }
 
 }
