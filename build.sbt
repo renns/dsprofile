@@ -45,9 +45,13 @@ scalaSource in Compile <<= baseDirectory { _ / "src" }
 
 scalaSource in Test <<= scalaSource in Compile
 
+unmanagedSources in Test <<= (scalaSource in Test) map { s => {
+    (s ** "*Tests.scala").get
+}}
+
 unmanagedSources in Compile <<=
     (scalaSource in Compile, unmanagedSources in Test) map { (s, tests) =>
-        ((s ** "*.scala") --- tests).get
+        ((s ** "*.scala") +++ (s ** "*.java") --- tests).get
     }
 
 parallelExecution in Test := false
