@@ -84,7 +84,7 @@ trait Profiler extends Values {
         computedResult
     }
 
-    def startItUp(): Unit = {
+    def profileStart(): Unit = {
         Events.profiling = true
         // Clear the event buffer
         Events.reset ()
@@ -92,7 +92,7 @@ trait Profiler extends Values {
         startTime = nanoTime
     }
 
-    def shutItDown(dimensionNames: Seq[Dimension]): Unit = {
+    def profileStop(dimensionNames: Seq[Dimension]): Unit = {
         import scala.collection.mutable.Stack
 
         Events.profiling = false
