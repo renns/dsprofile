@@ -30,7 +30,11 @@ class ProfilerTests extends Profiler
     }
   }
 
-  before {
+  after {
+    Events.reset
+  }
+  
+  test ("check simple result") {
     otp = ""
     profileStart()
     start("won" -> 1, "too" -> 2)
@@ -40,17 +44,49 @@ class ProfilerTests extends Profiler
     Thread.sleep(250)
     finish("won" -> 10, "too" -> 20)
     profileStop(Seq("won"))
-  }
 
-  after {
-    Events.reset
-  }
-  
-  test ("check result") {
     List("1","10").foreach { d => 
       countShouldBe(1, d, otp, 0.0)
       totalShouldBe(250, d, otp, 5.0)
     }
   }
 
+  test ("check slightly more complex result (test b)") {
+    otp = ""
+    profileStart()
+    start("won" -> 1, "too" -> 2)
+    Thread.sleep(250)
+    finish("won" -> 1, "too" -> 2)
+    start("won" -> 1, "too" -> 20)
+    Thread.sleep(750)
+    finish("won" -> 1, "too" -> 20)
+    start("won" -> 1, "too" -> 20)
+    Thread.sleep(750)
+    finish("won" -> 1, "too" -> 20)
+    profileStop(Seq("won"))
+
+    countShouldBe(3, "1", otp, 0.0)
+    totalShouldBe(1750, "1", otp, 5.0)
+  }
+
+  test ("test b on other dimension") {
+    otp = ""
+    profileStart()
+    start("won" -> 1, "too" -> 2)
+    Thread.sleep(250)
+    finish("won" -> 1, "too" -> 2)
+    start("won" -> 1, "too" -> 20)
+    Thread.sleep(750)
+    finish("won" -> 1, "too" -> 20)
+    start("won" -> 1, "too" -> 20)
+    Thread.sleep(750)
+    finish("won" -> 1, "too" -> 20)
+    profileStop(Seq("too"))
+
+    countShouldBe(1, "2", otp, 0.0)
+    totalShouldBe(250, "2", otp, 5.0)
+
+    countShouldBe(2, "20", otp, 0.0)
+    totalShouldBe(1500, "20", otp, 5.0)
+  }
 }
