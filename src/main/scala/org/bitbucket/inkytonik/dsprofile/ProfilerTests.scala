@@ -14,6 +14,22 @@ class ProfilerTests extends Profiler
   override def output(str: String){ otp = otp + str}
   override def outputln(str: String){ otp = otp + str + "\n"}
 
+  def countShouldBe = colShouldBe(6)_
+  def totalShouldBe = colShouldBe(0)_
+
+  // FIXME: Can't make use of default parameter, compiler complains for reasons I don't understand.
+  def colShouldBe(col: Int)(num: Int, dim: String, inp: String, within: Double = 0.0) = {
+    import scala.collection.JavaConversions._
+    val lines = inp.split("\n")
+    lines.foreach {l => 
+      val v = l.split("""\s+""")
+      if (v.length > 8 && v(8) == dim){
+        v(col).toDouble should be < (num + within)
+        v(col).toDouble should be > (num - within)
+      }
+    }
+  }
+
   before {
     otp = ""
     profileStart()
@@ -30,13 +46,11 @@ class ProfilerTests extends Profiler
     Events.reset
   }
   
-  test ("trivial starter") {
-    expectResult(0){0}
-  }
-
   test ("check result") {
-    otp should include regex """25\d\s+50\.\d\s+25\d\s+50\.\d\s+0\s+0\.0\s+1\s+50\.\d\s+10""".r
-    otp should include regex """25\d\s+50\.\d\s+25\d\s+50\.\d\s+0\s+0\.0\s+1\s+50\.\d\s+1""".r
+    List("1","10").foreach { d => 
+      countShouldBe(1, d, otp, 0.0)
+      totalShouldBe(250, d, otp, 5.0)
+    }
   }
 
 }
