@@ -60,11 +60,11 @@ We need a way to pass information from the evaluator execution and a way to
 trigger profiling reports to be printed.
 
 Information is passed to the profiler by calling the `start` and `finish`
-methods of the `Events` module. The parameters to these messages are Scala
+methods of the `Events` module. The parameters to the first of these messages are Scala
 tuples that describe the event that has occurred. For example, to indicate
 that an attribute evaluation has started, your code might call:
 
-    start ("event" -> "AttrEval", "subject" -> s, "attribute" -> a,
+    val ident = start ("event" -> "AttrEval", "subject" -> s, "attribute" -> a,
            "parameter" -> None)
 
 Each of the strings `"type"`, `"subject"` and so on is a _dimension_ and
@@ -74,6 +74,9 @@ in this particular occurrence. For example, the value `s` is assumed in the
 example to be a reference to the subject node of the evaluation; i.e., the
 syntax tree node whose attribute is being evaluated. Similarly, `a` is a value
 that refers to the attribute that is being evaluated.
+
+The `start` method will return a unique identifier for this event, which you 
+need to provide to the associated `finish` method.
 
 Both the dimensions and their values are arbitrary as far as the library is
 concerned. The dimensions are just strings and it is up to the user to
@@ -85,20 +88,19 @@ that method is used by the library to print the values (see below).
 At the point when an interesting execution region has completed, the program
 code should call the `Events.finish` method. As for the `start` method, the
 `finish` method takes as its parameters the dimensions of the event that has
-just finished. The finish call must have at least the same dimensions (and
-values) as the corresponding `start` call, since the library uses this
-information to check that the calls are properly nested. The `finish` call can
-have extra dimensions, which are usually used to pass information that is only
-known once the evaluation has finished.
+just finished. The finish call may have whatever dimensions it likes, which 
+are usually used to pass information that is only
+known once the evaluation has finished, or could be used to record the cahnges in
+dimensions during the event being captured.
 
 For example, in the attribute evaluation case, we might call `finish`
 as follows.
 
-    finish ("event" -> "AttrEval", "subject" -> s, "attribute" -> a,
-            "parameter" -> None, "value" -> v, "cached" -> false)
+    finish (ident, "value" -> v, "cached" -> false)
 
-We can see that the first part of the parameter list is the same in the
-`start` call. In addition, the new `"value"` and `"cached"` dimensions are
+We can see that the `ident` we were given earlier is passed in as the first argument and
+the remaining arguments are dimension tuples.  In this example, 
+the new `"value"` and `"cached"` dimensions are
 given values here, because we only know what they are once the attribute
 occurrence has been fully evaluated. As before, the value `v` is an arbitrary
 object that is the attribute value. The `cached` dimension is a Boolean that

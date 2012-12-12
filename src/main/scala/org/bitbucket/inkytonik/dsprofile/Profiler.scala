@@ -50,30 +50,6 @@ trait Profiler extends Values {
         value.split (":").toSeq
 
     /**
-     * Return whether event `e2` has a superset of the dimensions of `e1` and
-     * the same values for those dimensions. In effect, the `e1` dimensions are
-     * treated as an identifier and we check to see that `e2` has the same 
-     * identifier. Values are compared by casting to `AnyRef` and then using 
-     * reference equality.
-     */
-    def equalIds (e1 : Event, e2 : Event) : Boolean = {
-        val dims1 = e1.dimensions
-        val dims2 = e2.dimensions
-        dims1.forall {
-            case (k, v) =>
-                (dims2 contains k) && (
-                    (dims1 (k), dims2 (k)) match {
-                        case (r1 : AnyRef, r2 : AnyRef) =>
-                            r1 eq r2
-                        case (v1, v2) =>
-                            sys.error ("equalIds: comparison case reached for " +
-                                       v1 + " " + v2)
-                    }
-                )
-        }
-    }
-
-    /**
      * Run a computation under the control of the profiler. Print the requested
      * reports and return the value of the computation.
      */
@@ -128,7 +104,7 @@ trait Profiler extends Values {
                                    e.kind + " " + e.dimensions)
                     val es = startStack.pop ()
                     es.kind match {
-                        case Start if equalIds (es, e) =>
+                        case Start if (es.id == e.id) =>
                             val dirDescs = dirDescsStack.pop ().result ()
                             val allDescs = allDescsStack.pop ().result ()
                             val dtime = allDescs.map (_.stime).sum

@@ -37,12 +37,12 @@ class ProfilerTests extends Profiler
   test ("check simple result") {
     otp = ""
     profileStart()
-    start("won" -> 1, "too" -> 2)
+    val i = start("won" -> 1, "too" -> 2)
     Thread.sleep(250)
-    finish("won" -> 1, "too" -> 2)
-    start("won" -> 10, "too" -> 20)
+    finish(i)
+    val j = start("won" -> 10, "too" -> 20)
     Thread.sleep(250)
-    finish("won" -> 10, "too" -> 20)
+    finish(j)
     profileStop(Seq("won"))
 
     List("1","10").foreach { d => 
@@ -54,15 +54,15 @@ class ProfilerTests extends Profiler
   test ("check slightly more complex result (test b)") {
     otp = ""
     profileStart()
-    start("won" -> 1, "too" -> 2)
+    val i = start("won" -> 1, "too" -> 2)
     Thread.sleep(250)
-    finish("won" -> 1, "too" -> 2)
-    start("won" -> 1, "too" -> 20)
+    finish(i)
+    val j = start("won" -> 1, "too" -> 20)
     Thread.sleep(750)
-    finish("won" -> 1, "too" -> 20)
-    start("won" -> 1, "too" -> 20)
+    finish(j)
+    val k = start("won" -> 1, "too" -> 20)
     Thread.sleep(750)
-    finish("won" -> 1, "too" -> 20)
+    finish(k)
     profileStop(Seq("won"))
 
     countShouldBe(3, "1", otp, 0.0)
@@ -72,15 +72,15 @@ class ProfilerTests extends Profiler
   test ("test b on other dimension") {
     otp = ""
     profileStart()
-    start("won" -> 1, "too" -> 2)
+    val i = start("won" -> 1, "too" -> 2)
     Thread.sleep(250)
-    finish("won" -> 1, "too" -> 2)
-    start("won" -> 1, "too" -> 20)
+    finish(i)
+    val k = start("won" -> 1, "too" -> 20)
     Thread.sleep(750)
-    finish("won" -> 1, "too" -> 20)
-    start("won" -> 1, "too" -> 20)
+    finish(k)
+    val j = start("won" -> 1, "too" -> 20)
     Thread.sleep(750)
-    finish("won" -> 1, "too" -> 20)
+    finish(j)
     profileStop(Seq("too"))
 
     countShouldBe(1, "2", otp, 0.0)

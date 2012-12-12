@@ -29,12 +29,12 @@ object ScalaProfiler extends Profiler {
 
     type DimPair = Tuple2[String,Any]
 
-    def start (dimPairs : Array[DimPair]) {
+    def start (dimPairs : Array[DimPair]):Long = {
         Events.start (dimPairs : _*);
     }
 
-    def finish (dimPairs : Array[DimPair]) {
-        Events.finish (dimPairs : _*);
+    def finish (i: Long, dimPairs : Array[DimPair]) {
+        Events.finish (i, dimPairs : _*);
     }
 
 }

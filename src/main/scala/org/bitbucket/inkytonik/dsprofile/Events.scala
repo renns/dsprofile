@@ -36,6 +36,12 @@ object Events {
     var profiling = false
 
     /**
+     * Supply of Unique Id's
+     */
+    var uid:Long = 0
+    private def uniqueId():Long = {uid = uid+1; uid}
+
+    /**
      * The type of a dimension name.
      */
     type Dimension = String
@@ -77,7 +83,7 @@ object Events {
     /**
      * Base class of profiling events.
      */
-    class Event (val kind : EventKind, dimPairs : DimPair*) {
+    class Event (val id: Long, val kind : EventKind, dimPairs : DimPair*) {
 
         /**
          * The dimensions of this event.
@@ -108,18 +114,21 @@ object Events {
      * Generate a `Start` event with the given dimensions.
      */
     @inline
-    def start (dimPairs : DimPair*) {
+    def start (dimPairs : DimPair*): Long = {
+        val i = uniqueId()
         if (profiling)
-            events += new Event (Start, dimPairs : _*)
+            events += new Event (i, Start, dimPairs : _*)
+        i
     }
 
     /**
-     * Generate a `Finish` event with the given dimensions.
+     * Generate a `Finish` event which matches the start event
+     * with the given id, and which has the given dimensions.
      */
     @inline
-    def finish (dimPairs : DimPair*) {
+    def finish (i: Long, dimPairs : DimPair*) {
         if (profiling)
-            events += new Event (Finish, dimPairs : _*)
+            events += new Event (i, Finish, dimPairs : _*)
     }
 
 }

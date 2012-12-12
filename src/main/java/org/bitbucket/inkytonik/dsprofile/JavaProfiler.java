@@ -33,13 +33,14 @@ public class JavaProfiler {
     }
 
     @SafeVarargs
-    public static void start (Tuple2<String,Object>... dimPairs) {
-        ScalaProfiler.start (dimPairs);
+    public static long start (Tuple2<String,Object>... dimPairs){
+        long i = ScalaProfiler.start (dimPairs);
+        return i;
     }
 
     @SafeVarargs
-    public static void finish (Tuple2<String,Object>... dimPairs) {
-        ScalaProfiler.finish (dimPairs);
+    public static void finish (long i, Tuple2<String,Object>... dimPairs) {
+        ScalaProfiler.finish (i, dimPairs);
     }
 
 }
