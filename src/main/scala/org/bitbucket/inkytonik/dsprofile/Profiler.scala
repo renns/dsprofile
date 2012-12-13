@@ -57,9 +57,7 @@ trait Profiler extends Values {
         profileStart()
         val computedResult = computation
         profileStop(dimensionNames)
-        println("Here we go")
-        Events.events.foreach{e => println(e.id + "\n  " + e.kind + "\n  " + e.dimensions)}
-       computedResult
+        computedResult
     }
 
     def profileStart(): Unit = {
