@@ -54,22 +54,23 @@ trait Profiler extends Values {
      * reports and return the value of the computation.
      */
     def profileReports[T] (computation : => T, dimensionNames : Seq[Dimension]) : T = {
-        profileStart()
+        profileStart ()
         val computedResult = computation
-        profileStop(dimensionNames)
+        profileStop (dimensionNames)
         computedResult
     }
 
-    def profileStart(): Unit = {
+    def profileStart () {
         Events.profiling = true
+        
         // Clear the event buffer
         Events.reset ()
 
         startTime = nanoTime
     }
 
-    def profileStop(dimensionNames: Seq[Dimension]): Unit = {
-        profileStop()(dimensionNames)
+    def profileStop (dimensionNames : Seq[Dimension]) {
+        profileStop () (dimensionNames)
     }
 
     def profileStop(): Seq[Dimension] => Unit = {
@@ -129,11 +130,10 @@ trait Profiler extends Values {
         // The top element of the allDescStack now contains all of the records
         val records = allDescsStack.pop ().result ()
 
-        return {dimensionNames:Seq[Dimension] => 
-          // Print the reports
+        // Print the reports
+        {dimensionNames : Seq[Dimension] => 
           printReports (totalTime, dimensionNames, records)
         }
-
     }
 
     /**
