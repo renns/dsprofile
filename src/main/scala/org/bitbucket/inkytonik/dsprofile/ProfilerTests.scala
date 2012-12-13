@@ -89,4 +89,27 @@ class ProfilerTests extends Profiler
     countShouldBe(2, "20", otp, 0.0)
     totalShouldBe(1500, "20", otp, 5.0)
   }
+
+  test("attribute-like profile"){
+    otp = ""
+    case class AttrEval()
+    profileStart()
+    val i = start("event" -> AttrEval, "subject" -> "Use(int)", "attribute" -> "decl", "parameter" -> None)
+    val j = start("event" -> AttrEval, "subject" -> "Use(int)", "attribute" -> "lookup", "parameter" -> Some("int"))
+    val k = start("event" -> AttrEval, "subject" -> "VarDecl(Use(int),y)", "attribute" -> "lookup", "parameter" -> Some("int"))
+    val l = start("event" -> AttrEval, "subject" -> "VarDecl(Use(int),y)", "attribute" -> "declarationOf", "parameter" -> Some("int"))
+    finish(l, "value"->null, "cached" -> false)
+    val m = start("event" -> AttrEval, "subject" -> "VarDecl(Use(AA),a)", "attribute" -> "declarationOf", "parameter" -> Some("int"))
+    finish(m, "value" -> null, "cached" -> false)
+    finish(k, "value" -> null, "cached" -> false)
+    finish(j, "value" -> null, "cached" -> true)
+    finish(i, "value" -> null, "cached" -> true)
+    val reporter = profileStop()
+    reporter(Seq("event"))
+    reporter(Seq("attribute"))
+    countShouldBe(1, "decl", otp, 0.0)
+    countShouldBe(2, "lookup", otp, 0.0)
+    countShouldBe(2, "declarationOf", otp, 0.0)
+    countShouldBe(5, "AttrEval", otp, 0.0)
+  }
 }

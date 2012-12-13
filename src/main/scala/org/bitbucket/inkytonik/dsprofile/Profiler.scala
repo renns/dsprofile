@@ -57,7 +57,9 @@ trait Profiler extends Values {
         profileStart()
         val computedResult = computation
         profileStop(dimensionNames)
-        computedResult
+        println("Here we go")
+        Events.events.foreach{e => println(e.id + "\n  " + e.kind + "\n  " + e.dimensions)}
+       computedResult
     }
 
     def profileStart(): Unit = {
@@ -69,6 +71,10 @@ trait Profiler extends Values {
     }
 
     def profileStop(dimensionNames: Seq[Dimension]): Unit = {
+        profileStop()(dimensionNames)
+    }
+
+    def profileStop(): Seq[Dimension] => Unit = {
         import scala.collection.mutable.Stack
 
         Events.profiling = false
@@ -108,7 +114,7 @@ trait Profiler extends Values {
                             val dirDescs = dirDescsStack.pop ().result ()
                             val allDescs = allDescsStack.pop ().result ()
                             val dtime = allDescs.map (_.stime).sum
-                            val r = Record (e.time - es.time - dtime, e.dimensions) (dirDescs, allDescs)
+                            val r = Record (e.time - es.time - dtime, (e.dimensions ++ es.dimensions)) (dirDescs, allDescs)
                             dirDescsStack.top.append (r)
                             allDescsStack.top.appendAll (allDescs)
                             allDescsStack.top.append (r)
@@ -125,8 +131,10 @@ trait Profiler extends Values {
         // The top element of the allDescStack now contains all of the records
         val records = allDescsStack.pop ().result ()
 
-        // Print the reports
-        printReports (totalTime, dimensionNames, records)
+        return {dimensionNames:Seq[Dimension] => 
+          // Print the reports
+          printReports (totalTime, dimensionNames, records)
+        }
 
     }
 
