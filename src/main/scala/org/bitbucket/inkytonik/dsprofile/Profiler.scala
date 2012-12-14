@@ -142,7 +142,7 @@ trait Profiler extends Values {
     def profile[T] (computation : => T, dimensionNames : Dimension*) : T = {
         profileReports (computation, dimensionNames)
     }
-    
+
     /**
      * Run `computation` and report timings. `computation` is first run `init`
      * times to warm up the JVM. Then it is run `n` more times. The `discard`
