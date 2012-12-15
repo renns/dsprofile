@@ -8,11 +8,33 @@ organization := "org.bitbucket.inkytonik.dsprofile"
 
 // Scala compiler settings
 
-scalaVersion := "2.10.0-RC3"
+scalaVersion := "2.10.0-RC5"
 
-scalaBinaryVersion := "2.10.0-RC3"
+scalaBinaryVersion <<= scalaVersion
 
-scalacOptions ++= Seq ("-deprecation", "-feature", "-unchecked")
+crossScalaVersions := Seq ("2.9.2", "2.10.0-RC5")
+
+scalacOptions := Seq ("-deprecation", "-unchecked")
+
+scalacOptions in Compile <<= (scalaVersion, scalacOptions) map {
+    (version, options) =>
+        val versionOptions =
+            if (version.startsWith ("2.10"))
+                Seq ("-feature")
+            else
+                Seq ()
+        options ++ versionOptions
+}
+
+scalacOptions in Test <<= (scalaVersion, scalacOptions) map {
+    (version, options) =>
+        val versionOptions =
+            if (version.startsWith ("2.10"))
+                Seq ("-feature")
+            else
+                Seq ()
+        options ++ versionOptions
+}
 
 // Migration manager (mima)
 
@@ -26,15 +48,20 @@ scalacOptions ++= Seq ("-deprecation", "-feature", "-unchecked")
 
 logLevel := Level.Info
 
-shellPrompt <<= (name, version) { (n, v) => 
+shellPrompt <<= (name, version) { (n, v) =>
      _ => n + " " + v + "> "
 }
 
+// Dependencies
 
 libraryDependencies <++= scalaVersion {
     version =>
-        Seq ( "org.scalatest" %% "scalatest" % "2.0.M5-B1" % "test"
-            )
+        Seq (
+            if (version.startsWith ("2.10"))
+                "org.scalatest" %% "scalatest" % "2.0.M5-B1" % "test"
+            else
+                "org.scalatest" %% "scalatest" % "2.0.M6-SNAP1" % "test"
+        )
 }
 
 // No main class since dsprofile is a library
@@ -63,9 +90,9 @@ parallelExecution in Test := false
 // FIXME
 // scalacOptions in (Compile, doc) <++= baseDirectory map {
 //     bd => Seq (
-//         "-sourcepath", 
-//             bd.getAbsolutePath, 
-//         "-doc-source-url", 
+//         "-sourcepath",
+//             bd.getAbsolutePath,
+//         "-doc-source-url",
 //             "https://code.google.com/p/kiama/source/browse€{FILE_PATH}.scala"
 //     )
 // }
@@ -76,23 +103,23 @@ parallelExecution in Test := false
 // publishTo <<= version { v =>
 //     val nexus = "https://oss.sonatype.org/"
 //     if (v.trim.endsWith ("SNAPSHOT"))
-//         Some ("snapshots" at nexus + "content/repositories/snapshots") 
+//         Some ("snapshots" at nexus + "content/repositories/snapshots")
 //     else
 //         Some ("releases" at nexus + "service/local/staging/deploy/maven2")
 // }
-// 
+//
 // publishMavenStyle := true
-// 
+//
 // publishArtifact in Test := true
-// 
+//
 // pomIncludeRepository := { x => false }
-// 
+//
 // pomExtra := (
 //     <url>http://kiama.googlecode.com</url>
 //     <licenses>
 //         <license>
 //             <name>LGPL 3.0 license</name>
-//             <url>http://www.opensource.org/licenses/lgpl-3.0.html</url>        
+//             <url>http://www.opensource.org/licenses/lgpl-3.0.html</url>
 //             <distribution>repo</distribution>
 //         </license>
 //     </licenses>
