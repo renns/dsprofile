@@ -33,4 +33,14 @@ class EventsTests extends FunSuite with BeforeAndAfter {
     }
   }
 
+  test ("wrapper interface") {
+    def do_it {
+      val i = 1
+    }
+    Events.profiling = true
+    Events.wrap("one" -> 10, "two" -> 20) {do_it}
+    Events.profiling = false
+    expectResult (4) {Events.events.result.length}
+  }
+
 }

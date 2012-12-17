@@ -131,4 +131,11 @@ object Events {
             events += new Event (i, Finish, dimPairs : _*)
     }
 
+    def wrap[T] (dimPairs : DimPair*) (c : => T) : T = {
+        val i = start (dimPairs :_*)
+        val r = c
+        finish(i)
+        r
+    }
+
 }
