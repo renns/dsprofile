@@ -115,4 +115,23 @@ class ProfilerTests extends Profiler
     countShouldBe (2, "declarationOf", otp, 0.0)
     countShouldBe (5, "AttrEval", otp, 0.0)
   }
+
+  test ("that the finish dimension values override the start dimension values") {
+    otp = ""
+    profileStart()
+    val i = start ("subject" -> "Use(int)", "attribute" -> "decl", "parameter" -> None)
+    val j = start ("subject" -> "Use(int)", "attribute" -> "lookup", "parameter" -> Some("int"))
+    val k = start ("subject" -> "VarDecl(Use(int),y)", "attribute" -> "lookup", "parameter" -> Some("int"))
+    val l = start ("subject" -> "VarDecl(Use(int),y)", "attribute" -> "declarationOf", "parameter" -> Some("int"))
+    finish (l, "value"->null, "cached" -> false)
+    val m = start ("subject" -> "VarDecl(Use(AA),a)", "attribute" -> "declarationOf", "parameter" -> Some("int"))
+    finish (m, "value" -> null, "cached" -> false)
+    finish (k, "value" -> null, "cached" -> false)
+    finish (j, "value" -> null, "cached" -> true)
+    // here we change the attribute dimension of the i event so that there are now three lookup attributes
+    finish (i, "attribute" -> "lookup", "value" -> null, "cached" -> true)
+    val reporter = profileStop ()
+    reporter (Seq("attribute"))
+    countShouldBe(3, "lookup", otp, 0.0)
+  }
 }

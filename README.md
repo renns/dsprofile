@@ -87,10 +87,10 @@ that method is used by the library to print the values (see below).
 
 At the point when an interesting execution region has completed, the program
 code should call the `Events.finish` method. As for the `start` method, the
-`finish` method takes as its parameters the dimensions of the event that has
+`finish` method takes as its parameters some dimensions of the event that has
 just finished. The finish call may have whatever dimensions it likes, which 
 are usually used to pass information that is only
-known once the evaluation has finished, or could be used to record the cahnges in
+known once the evaluation has finished, or could be used to record the changes in
 dimensions during the event being captured.
 
 For example, in the attribute evaluation case, we might call `finish`
@@ -181,6 +181,31 @@ will not fit on the line. In those cases, it will print a footnote number
 instead and will print the value as a footnote after all of the tables have
 been printed. Thus, the dimension could be something such as a tree node which
 might be printed in full or pretty-printed.
+
+Alternately, `profileStart()` can be called to begin profiling and `profileStop`
+called to complete the profile.  `profileStop` can be passed dimensions fo the 
+profile report in the same way as `profile` (but they must be passed in a sequence
+like a list).  For example
+
+    profileStart()
+    val ident = Events.start("type" -> "the_type")
+    Events.finish(ident)
+    profileStop(Seq("type"))
+
+It is also possible to defer the generateion of the report when using `profileStart`
+and `profileStop` by not passing in the dimensions to profile.  In this case
+`profileStop` will return a closure which will print a report upon you giving it
+the dimensions to profile.  This allows you to print the profile at a later time
+or to print it multiple times for different dimension sets, for example
+
+    profileStart()
+    val i = Events.start("type" -> "the_type")
+    val j = Events.start("style" -> "much")
+    Events.finish(ident)
+    val reporter = profileStop()
+    reporter(Seq("type"))
+    reporter(Seq("style"))
+
 
 Using the library from Java
 ===========================
