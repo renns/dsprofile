@@ -1,7 +1,7 @@
 /**
  * This file is part of dsprofile.
  *
- * Copyright (C) 2012 Anthony M Sloane, Macquarie University.
+ * Copyright (C) 2012-2013 Anthony M Sloane, Macquarie University.
  *
  * dsprofile is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the
@@ -36,10 +36,24 @@ object Events {
     var profiling = false
 
     /**
-     * Supply of Unique Id's
+     * Supply of unique event identifiers.
      */
-    var uid:Long = 0
-    private def uniqueId():Long = {uid = uid+1; uid}
+    private object uniqueId {
+
+        /**
+         * Unique id seed.
+         */
+        private var uid : Long = 0
+
+        /**
+         * Return the next unique id.
+         */
+        def apply () : Long = {
+            uid = uid + 1
+            uid
+        }
+
+    }
 
     /**
      * The type of a dimension name.
@@ -114,8 +128,8 @@ object Events {
      * Generate a `Start` event with the given dimensions.
      */
     @inline
-    def start (dimPairs : DimPair*): Long = {
-        val i = uniqueId()
+    def start (dimPairs : DimPair*) : Long = {
+        val i = uniqueId ()
         if (profiling)
             events += new Event (i, Start, dimPairs : _*)
         i
@@ -126,15 +140,20 @@ object Events {
      * with the given id, and which has the given dimensions.
      */
     @inline
-    def finish (i: Long, dimPairs : DimPair*) {
+    def finish (i : Long, dimPairs : DimPair*) {
         if (profiling)
             events += new Event (i, Finish, dimPairs : _*)
     }
 
+    /**
+     * Wrap an execution of `c` by a `Start` event defined by the dimension
+     * values given by `dimPairs` and a corresponding `Finish` event with no
+     * extra dimension values.
+     */
     def wrap[T] (dimPairs : DimPair*) (c : => T) : T = {
         val i = start (dimPairs :_*)
         val r = c
-        finish(i)
+        finish (i)
         r
     }
 

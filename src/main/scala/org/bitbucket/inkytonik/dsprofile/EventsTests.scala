@@ -1,46 +1,66 @@
+/**
+ * This file is part of dsprofile.
+ *
+ * Copyright (C) 2012-2013 Anthony M Sloane, Matthew Roberts, Macquarie University.
+ *
+ * dsprofile is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * dsprofile is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with dsprofile.  (See files COPYING and COPYING.LESSER.)  If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
+
 package org.bitbucket.inkytonik.dsprofile
 
 import org.scalatest.{BeforeAndAfter, FunSuite}
 
 class EventsTests extends FunSuite with BeforeAndAfter {
 
-  before {
-    Events.profiling = true
-    Events.reset
-    val i = Events.start ( ("one", 1)
-                         , ("two", 2)
-                         )
-    Events.finish (i)
-    Events.profiling = false
-  }
-
-  after {
-    Events.reset
-  }
-  
-  test ("length is two"){
-    expectResult (2) {Events.events.result ().length}
-  }
-
-  test ("length after reset") {
-    Events.reset
-    expectResult (0) {Events.events.result ().length}
-  }
-
-  test ("test event ids are unique") {
-    expectResult (1000) {
-      ((((1 to 1000).toList).map {i => Events.start ()}).toSet).size
+    before {
+        Events.profiling = true
+        Events.reset
+        val i = Events.start ( ("one", 1)
+                             , ("two", 2)
+                             )
+        Events.finish (i)
+        Events.profiling = false
     }
-  }
 
-  test ("wrapper interface") {
-    def do_it {
-      val i = 1
+    after {
+        Events.reset
     }
-    Events.profiling = true
-    Events.wrap("one" -> 10, "two" -> 20) {do_it}
-    Events.profiling = false
-    expectResult (4) {Events.events.result.length}
-  }
+
+    test ("length is two") {
+        expectResult (2) {Events.events.result ().length}
+    }
+
+    test ("length after reset") {
+        Events.reset
+        expectResult (0) {Events.events.result ().length}
+    }
+
+    test ("test event ids are unique") {
+        expectResult (1000) {
+            ((((1 to 1000).toList).map {i => Events.start ()}).toSet).size
+        }
+    }
+
+    test ("wrapper interface") {
+        def do_it {
+            val i = 1
+        }
+        Events.profiling = true
+        Events.wrap ("one" -> 10, "two" -> 20) {do_it}
+        Events.profiling = false
+        expectResult (4) {Events.events.result.length}
+    }
 
 }

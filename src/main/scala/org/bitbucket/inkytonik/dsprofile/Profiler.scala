@@ -1,7 +1,7 @@
 /**
  * This file is part of dsprofile.
  *
- * Copyright (C) 2012 Anthony M Sloane, Macquarie University.
+ * Copyright (C) 2012-2013 Anthony M Sloane, Macquarie University.
  *
  * dsprofile is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the
@@ -51,7 +51,7 @@ trait Profiler extends Values {
 
     /**
      * Run a computation under the control of the profiler. Print the requested
-     * reports and return the value of the computation.
+     * report and return the value of the computation.
      */
     def profileReports[T] (computation : => T, dimensionNames : Seq[Dimension]) : T = {
         profileStart ()
@@ -60,20 +60,33 @@ trait Profiler extends Values {
         computedResult
     }
 
+    /**
+     * Start profiling by turning on the profiling system, resetting the events
+     * buffer and recording the start time.
+     */
     def profileStart () {
         Events.profiling = true
-        
+
         // Clear the event buffer
         Events.reset ()
 
         startTime = nanoTime
     }
 
+    /**
+     * Stop profiling and generate a profile report for the given dimension
+     * names.
+     */
     def profileStop (dimensionNames : Seq[Dimension]) {
         profileStop () (dimensionNames)
     }
 
-    def profileStop(): Seq[Dimension] => Unit = {
+    /**
+     * Stop profiling by turning off the profiling system and recording the
+     * total execution time. Return a function that can be used to generate
+     * a profile report when given the relevant dimension names.
+     */
+    def profileStop () : Seq[Dimension] => Unit = {
         import scala.collection.mutable.Stack
 
         Events.profiling = false
@@ -89,13 +102,13 @@ trait Profiler extends Values {
         val startStack = new Stack[Event] ()
 
         // Stacks of record lists to hold the records that have been created since each start
-        // event on stack was seen. The dummy entries are there so that root records have 
-        // somewhere to add themselves. The dir one is for direct descendants and the all 
+        // event on stack was seen. The dummy entries are there so that root records have
+        // somewhere to add themselves. The dir one is for direct descendants and the all
         // one is for all descendants.
         val dirDescsStack = Stack (new ListBuffer[Record] ())
         val allDescsStack = Stack (new ListBuffer[Record] ())
 
-        // Process all of the event looking for matching start and finish events in 
+        // Process all of the event looking for matching start and finish events in
         // a LIFO structure
         for (e <- allevents) {
             e.kind match {
@@ -105,7 +118,7 @@ trait Profiler extends Values {
                     allDescsStack.push (new ListBuffer[Record] ())
                 case Finish =>
                     if (startStack.isEmpty)
-                        sys.error ("profile: empty stack looking for Start event for " + 
+                        sys.error ("profile: empty stack looking for Start event for " +
                                    e.kind + " " + e.dimensions)
                     val es = startStack.pop ()
                     es.kind match {
@@ -130,8 +143,8 @@ trait Profiler extends Values {
         // The top element of the allDescStack now contains all of the records
         val records = allDescsStack.pop ().result ()
 
-        // Print the reports
-        {dimensionNames : Seq[Dimension] => 
+        // Make a function that can print reports when given dimension names
+        {dimensionNames : Seq[Dimension] =>
           printReports (totalTime, dimensionNames, records)
         }
     }
@@ -229,10 +242,9 @@ trait Profiler extends Values {
      */
     def nanoToMs (nano : Long) : Long =
         nano / 1000000
-    
+
     /**
      * Print the profiling report by summarising along the requested dimensions.
-     * FIXME: take into account multiple record types, we now assume attreval only
      * FIXME: avoid multiple passes through the data?
      */
     def printReports (totalTime : Long, dimensionNames : Seq[Dimension], records : List[Record]) {
@@ -252,7 +264,7 @@ trait Profiler extends Values {
                 outputln ("%6d profile records".format (nrecords))
                 outputln ()
             }
-            
+
             summariseAlongDims (dimensionNames, records, nrecords, profiledTime)
 
             finishReport ()
@@ -265,27 +277,27 @@ trait Profiler extends Values {
      */
     def summariseAlongDims (dimensionNames : Seq[Dimension], records : List[Record],
                             nrecords : Int, profiledTime : Long) {
-        
+
         import java.util.IdentityHashMap
 
         // A record for each value of the dimension
         class DimData {
-    
+
             /**
              * The evaluations that are summarised here
              */
             val records = new ListBuffer[Record] ()
-    
+
             /**
              * Total number of records associated with this value
              */
             var nrecords = 0
 
             /**
-             * The descendant records that are accounted for here. We don't really 
+             * The descendant records that are accounted for here. We don't really
              */
             var allDescs = new HashSet[Record] ()
-    
+
             /**
              * The total time in milliseconds of execution that is apportioned to
              * this value. I.e., the sum of the self time and the descendant time.
@@ -298,7 +310,7 @@ trait Profiler extends Values {
              * not including any descendant ones.
              */
             var stime = 0L
-    
+
             /**
              * The time in milliseconds that descendant records took.
              */
@@ -309,9 +321,9 @@ trait Profiler extends Values {
              */
             override def toString : String =
                 records.toString + ", " + nrecords + ", " + time + "," + dtime
-    
+
         }
-        
+
         /**
          * Bucket of a dimension value and its associated data.
          */
@@ -328,10 +340,10 @@ trait Profiler extends Values {
          * values.
          */
         def aggregate (records : List[Record], dimension : String) : Buckets = {
-    
+
             // Map of data per dimension value
             val dimMap = new HashMap[Any,DimData] ()
-            
+
             // Get a dimension map entry for a given key, creating it in
             // the map if it didn't exist already
             def dimEntry (a : Value) : DimData =
@@ -347,7 +359,7 @@ trait Profiler extends Values {
 
                 // Look up this record to get the appropriate bucket entry
                 val entry = getDimEntry (r)
-                
+
                 // Record this record and its time with in the entry
                 entry.records += r
                 entry.nrecords += 1
@@ -357,7 +369,7 @@ trait Profiler extends Values {
                 // those that are in the same bucket entry as r (and hence don't
                 // count as descendant time) and those that aren't, which do. The
                 // latter's self time is accumulated in the descendant time of the
-                // entry. Avoid adding a descendant more than once if it is 
+                // entry. Avoid adding a descendant more than once if it is
                 // encountered.
                 for (d <- r.allDescs) {
                     val dentry = getDimEntry (d)
@@ -368,21 +380,21 @@ trait Profiler extends Values {
                 }
 
             }
-    
+
             // Sort the data for in decreasing order of time expended. Ignore zero
             // count ones, these are the attributes that demanded the ones we are
-            // interested in but are not included in this aggregation 
+            // interested in but are not included in this aggregation
             dimMap.toList.filter {
                 _._2.nrecords != 0
             }.sortWith {
                 _._2.time > _._2.time
             }
-            
+
         }
 
         /**
-         * List of footnote entries. If a value is to be printed in a table and 
-         * it is too long to fit comfortably on a line with the rest of the 
+         * List of footnote entries. If a value is to be printed in a table and
+         * it is too long to fit comfortably on a line with the rest of the
          * information, we put its string representation here and print the
          * footnotes after the table.
          */
@@ -495,7 +507,7 @@ trait Profiler extends Values {
         // Print the footnote table. If the string contains a newline it is
         // started on the line after the footnote number, otherwise on the
         // same line.
-        if (printTables) 
+        if (printTables)
             for ((as, i) <- footnotes.zipWithIndex) {
                 val nlOrSpace = if (as contains '\n') "\n" else " "
                 outputln ("[%d]%s%s".format (i + 1, nlOrSpace, as))

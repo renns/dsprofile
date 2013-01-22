@@ -1,7 +1,7 @@
 /**
  * This file is part of dsprofile.
  *
- * Copyright (C) 2012 Anthony M Sloane, Macquarie University.
+ * Copyright (C) 2012-2013 Anthony M Sloane, Macquarie University.
  *
  * dsprofile is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the
@@ -24,7 +24,7 @@ package org.bitbucket.inkytonik.dsprofile
  * The interface and default implementation for a profiler's access to profiled
  * values. Clients can provide implementations of these operations to override
  * or customise the treatment of values for specific purposes. E.g., derived
- * dimensions can be added by overriding `dimValue` and defaulting to the 
+ * dimensions can be added by overriding `dimValue` and defaulting to the
  * version here.
  */
 trait Values {
@@ -37,7 +37,7 @@ trait Values {
      * with the same id. `stime` is the difference between times of these two
      * events, not including any time spent in descendants (self time). `allDescs`
      * is all descendants. `dimensions` is the union of the two event's dimensions.
-     * 
+     *
      * Descendant records are the records that resulted from execution that happened
      * while the execution represented by this record was going on. I.e., the
      * descendant executions were nested between the start and finish events that
@@ -60,7 +60,7 @@ trait Values {
     def dimValue (record : Record, dim : Dimension) : Value =
         if (record.dimensions contains dim)
             record.dimensions (dim)
-        else 
+        else
             "unknown dimension \"" + dim + "\""
 
     /**
@@ -71,7 +71,7 @@ trait Values {
     def isEventType (record : Record, eventtype : String) : Boolean =
         (record.dimensions contains "event") &&
             (record.dimensions ("event") == eventtype)
-    
+
     /**
      * Check for an intrinsic dimension `needed` on `record`, while looking for
      * a value of the derived dimension `dim`. If `needed` is found, get its value
@@ -96,7 +96,7 @@ trait Values {
                 "\" cannot be derived from \"" + needed + "\""
 
     /**
-     * Convert an arbitrary value to a string using `toString`. Override this 
+     * Convert an arbitrary value to a string using `toString`. Override this
      * method to customise how values are shown.
      */
     def valueToString (a : Value) : String =

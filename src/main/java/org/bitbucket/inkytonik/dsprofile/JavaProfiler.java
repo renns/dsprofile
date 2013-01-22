@@ -22,6 +22,9 @@ package org.bitbucket.inkytonik.dsprofile;
 
 import scala.Tuple2;
 
+/**
+ * Entry points to profiling library from Java.
+ */
 public class JavaProfiler {
 
     public static void profile (Action action, String... dimensions) {

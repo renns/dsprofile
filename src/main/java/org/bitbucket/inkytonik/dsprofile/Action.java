@@ -1,7 +1,7 @@
 /**
  * This file is part of dsprofile.
  *
- * Copyright (C) 2012 Anthony M Sloane, Macquarie University.
+ * Copyright (C) 2012-2013 Anthony M Sloane, Macquarie University.
  *
  * dsprofile is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the
@@ -20,8 +20,11 @@
 
 package org.bitbucket.inkytonik.dsprofile;
 
+/**
+ * Simple action interface used to pass delayed computation to profiler.
+ */
 public interface Action {
 
     public void execute ();
-    
+
 }

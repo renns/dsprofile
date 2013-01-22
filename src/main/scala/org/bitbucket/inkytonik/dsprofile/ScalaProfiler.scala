@@ -1,7 +1,7 @@
 /**
  * This file is part of dsprofile.
  *
- * Copyright (C) 2012 Anthony M Sloane, Macquarie University.
+ * Copyright (C) 2012-2013 Anthony M Sloane, Macquarie University.
  *
  * dsprofile is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the
@@ -20,6 +20,9 @@
 
 package org.bitbucket.inkytonik.dsprofile
 
+/**
+ * Entry points to profiling library from Scala.
+ */
 object ScalaProfiler extends Profiler {
 
     def profile (action : Action, dimensions : Array[String]) {
@@ -29,12 +32,12 @@ object ScalaProfiler extends Profiler {
 
     type DimPair = Tuple2[String,Any]
 
-    def start (dimPairs : Array[DimPair]):Long = {
-        Events.start (dimPairs : _*);
+    def start (dimPairs : Array[DimPair]) : Long = {
+        Events.start (dimPairs : _*)
     }
 
     def finish (i: Long, dimPairs : Array[DimPair]) {
-        Events.finish (i, dimPairs : _*);
+        Events.finish (i, dimPairs : _*)
     }
 
 }
