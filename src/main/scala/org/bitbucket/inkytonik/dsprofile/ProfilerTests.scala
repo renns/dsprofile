@@ -31,14 +31,15 @@ class ProfilerTests extends Profiler
                     with ShouldMatchers {
 
     var otp = ""
-    override def output (str: String) {otp = otp + str}
-    override def outputln (str: String) {otp = otp + str + "\n"}
+    override def output (str : String) {otp = otp + str}
+    override def outputln (str : String) {otp = otp + str + "\n"}
 
     val countShouldBe = colShouldBe (6) _
     val totalShouldBe = colShouldBe (0) _
 
     // FIXME: Can't make use of default parameter, compiler complains for reasons I don't understand.
-    def colShouldBe( col: Int) (num: Int, dim: String, inp: String, within: Double = 0.0) = {
+    // FIXME: I think it's because you can't have default param values on functions, just methods
+    def colShouldBe (col : Int) (num : Int, dim : String, inp : String, within : Double = 0.0) = {
         import scala.collection.JavaConversions._
         val lines = inp.split ("\n")
         lines.foreach { l =>
@@ -129,7 +130,7 @@ class ProfilerTests extends Profiler
         finish (i, "value" -> null, "cached" -> true)
         val reporter = profileStop ()
         reporter (Seq ("event"))
-        reporter (Seq("attribute"))
+        reporter (Seq ("attribute"))
         countShouldBe (1, "decl", otp, 0.0)
         countShouldBe (2, "lookup", otp, 0.0)
         countShouldBe (2, "declarationOf", otp, 0.0)
@@ -138,7 +139,7 @@ class ProfilerTests extends Profiler
 
     test ("that the finish dimension values override the start dimension values") {
         otp = ""
-        profileStart()
+        profileStart ()
         val i = start ("subject" -> "Use(int)", "attribute" -> "decl", "parameter" -> None)
         val j = start ("subject" -> "Use(int)", "attribute" -> "lookup", "parameter" -> Some("int"))
         val k = start ("subject" -> "VarDecl(Use(int),y)", "attribute" -> "lookup", "parameter" -> Some("int"))
@@ -151,8 +152,8 @@ class ProfilerTests extends Profiler
         // here we change the attribute dimension of the i event so that there are now three lookup attributes
         finish (i, "attribute" -> "lookup", "value" -> null, "cached" -> true)
         val reporter = profileStop ()
-        reporter (Seq("attribute"))
-        countShouldBe(3, "lookup", otp, 0.0)
+        reporter (Seq ("attribute"))
+        countShouldBe (3, "lookup", otp, 0.0)
     }
 
 }
