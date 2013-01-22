@@ -65,7 +65,7 @@ tuples that describe the event that has occurred. For example, to indicate
 that an attribute evaluation has started, your code might call:
 
     val ident = start ("event" -> "AttrEval", "subject" -> s, "attribute" -> a,
-           "parameter" -> None)
+                       "parameter" -> None)
 
 Each of the strings `"type"`, `"subject"` and so on is a _dimension_ and
 together they identify the particular event that has occurred. The second
@@ -75,7 +75,7 @@ example to be a reference to the subject node of the evaluation; i.e., the
 syntax tree node whose attribute is being evaluated. Similarly, `a` is a value
 that refers to the attribute that is being evaluated.
 
-The `start` method will return a unique identifier for this event, which you 
+The `start` method will return a unique identifier for this event, which you
 need to provide to the associated `finish` method.
 
 Both the dimensions and their values are arbitrary as far as the library is
@@ -88,7 +88,7 @@ that method is used by the library to print the values (see below).
 At the point when an interesting execution region has completed, the program
 code should call the `Events.finish` method. As for the `start` method, the
 `finish` method takes as its parameters some dimensions of the event that has
-just finished. The finish call may have whatever dimensions it likes, which 
+just finished. The finish call may have whatever dimensions it likes, which
 are usually used to pass information that is only
 known once the evaluation has finished, or could be used to record the changes in
 dimensions during the event being captured.
@@ -99,7 +99,7 @@ as follows.
     finish (ident, "value" -> v, "cached" -> false)
 
 We can see that the `ident` we were given earlier is passed in as the first argument and
-the remaining arguments are dimension tuples.  In this example, 
+the remaining arguments are dimension tuples.  In this example,
 the new `"value"` and `"cached"` dimensions are
 given values here, because we only know what they are once the attribute
 occurrence has been fully evaluated. As before, the value `v` is an arbitrary
@@ -126,9 +126,9 @@ The first part of a report produced by this call is:
        716 ms total time
         95 ms profiled time (13.3%)
       2543 profile records
-    
+
     By attribute:
-    
+
      Total Total  Self  Self  Desc  Desc Count Count
         ms     %    ms     %    ms     %           %
         56  59.4    18  19.7    37  39.7   621  24.4  entity
@@ -142,16 +142,16 @@ The first part of a report produced by this call is:
          3   3.5     3   3.5     0   0.0   234   9.2  typebasetype
          1   2.1     1   1.9     0   0.2    96   3.8  deftype
          0   1.0     0   1.0     0   0.0    52   2.0  level
-    
+
     By cached for entity:
-    
+
      Total Total  Self  Self  Desc  Desc Count Count
         ms     %    ms     %    ms     %           %
         14  14.7    12  12.8     1   1.9   158   6.2  false
          6   6.8     6   6.8     0   0.0   463  18.2  true
-    
+
     By cached for env.in:
-    
+
      Total Total  Self  Self  Desc  Desc Count Count
         ms     %    ms     %    ms     %           %
         27  28.9    25  27.1     1   1.8   536  21.1  false
@@ -183,35 +183,35 @@ been printed. Thus, the dimension could be something such as a tree node which
 might be printed in full or pretty-printed.
 
 Alternately, `profileStart()` can be called to begin profiling and `profileStop`
-called to complete the profile.  `profileStop` can be passed dimensions fo the 
+called to complete the profile.  `profileStop` can be passed dimensions for the
 profile report in the same way as `profile` (but they must be passed in a sequence
 like a list).  For example
 
-    profileStart()
-    val ident = Events.start("type" -> "the_type")
-    Events.finish(ident)
-    profileStop(Seq("type"))
+    profileStart ()
+    val ident = Events.start ("type" -> "the_type")
+    Events.finish (ident)
+    profileStop (Seq ("type"))
 
-It is also possible to defer the generateion of the report when using `profileStart`
+It is also possible to defer the generation of the report when using `profileStart`
 and `profileStop` by not passing in the dimensions to profile.  In this case
 `profileStop` will return a closure which will print a report upon you giving it
 the dimensions to profile.  This allows you to print the profile at a later time
 or to print it multiple times for different dimension sets, for example
 
-    profileStart()
-    val i = Events.start("type" -> "the_type")
-    val j = Events.start("style" -> "much")
-    Events.finish(ident)
-    val reporter = profileStop()
-    reporter(Seq("type"))
-    reporter(Seq("style"))
+    profileStart ()
+    val i = Events.start ("type" -> "the_type")
+    val j = Events.start ("style" -> "much")
+    Events.finish (ident)
+    val reporter = profileStop ()
+    reporter (Seq ("type"))
+    reporter (Seq ("style"))
 
 
 Using the library from Java
 ===========================
 
-The dsprofile library can also be used from Java code. To make this more 
-convenient, some bridge types and methods are used to communicate with 
+The dsprofile library can also be used from Java code. To make this more
+convenient, some bridge types and methods are used to communicate with
 the library implementation in Scala.
 
 The following code shows a simple Java program and how the profiler can be
@@ -219,22 +219,22 @@ used from it using these bridges.
 
     import org.bitbucket.inkytonik.dsprofile.Action;
     import org.bitbucket.inkytonik.dsprofile.JavaProfiler;
-    
+
     public class Program extends JavaProfiler {
-    
+
         public static void main (String[] args) {
-    
+
             Action action =
                 new Action () {
                     public void execute () {
                         doSomething (10);
                     }
                 };
-    
+
             profile (action, "foo", "bar");
-    
+
         }
-    
+
         static void doSomething (int num) {
             start (tuple ("event", "something"),
                    tuple ("foo", num),
@@ -250,7 +250,7 @@ used from it using these bridges.
                     tuple ("bar", num * 2),
                     tuple ("ble", num + 1));
         }
-    
+
     }
 
 The `Action` type is needed since evaluation of  the first parameter to
@@ -270,13 +270,13 @@ The beginning part of the output produced by this program is as follows:
     x = 704982704
     x = 704982704
     x = 704982704
-    
+
         36 ms total time
         20 ms profiled time (57.1%)
         10 profile records
-    
+
     By foo:
-    
+
      Total Total  Self  Self  Desc  Desc Count Count
         ms     %    ms     %    ms     %           %
         20 100.0     3  15.2    17  84.8     1  10.0  10
@@ -289,15 +289,15 @@ The beginning part of the output produced by this program is as follows:
          3  18.8     0   0.7     3  18.1     1  10.0  3
          3  18.1     0   0.9     3  17.2     1  10.0  2
          3  17.2     3  17.2     0   0.0     1  10.0  1
-    
+
     By bar for 10:
-    
+
      Total Total  Self  Self  Desc  Desc Count Count
         ms     %    ms     %    ms     %           %
         20 100.0     3  15.2    17  84.8     1  10.0  20
-    
+
     By bar for 9:
-    
+
      Total Total  Self  Self  Desc  Desc Count Count
         ms     %    ms     %    ms     %           %
         17  84.8     3  17.9    13  66.9     1  10.0  18
