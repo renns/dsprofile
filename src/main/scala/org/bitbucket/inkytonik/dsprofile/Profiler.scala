@@ -157,6 +157,17 @@ trait Profiler extends Values {
     }
 
     /**
+     * Print a trace of the events for which a given predicate is true. If the
+     * predicate is omitted it defaults to one that is always true.
+     */
+    def trace (predicate : Event => Boolean = (_ => true)) {
+        events.map (event =>
+            if (predicate (event))
+                outputln (event.toString)
+        )
+    }
+
+    /**
      * Run `computation` and report timings. `computation` is first run `init`
      * times to warm up the JVM. Then it is run `n` more times. The `discard`
      * biggest and smallest values are then discarded and the resulting values

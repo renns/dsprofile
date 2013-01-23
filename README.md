@@ -206,6 +206,24 @@ or to print it multiple times for different dimension sets, for example
     reporter (Seq ("type"))
     reporter (Seq ("style"))
 
+`Profiler.trace` can be used to obtain a simple trace of the events. It takes
+a single parameter which is a predicate on events. If the parameter is omitted
+it defaults to a predicate that is always true. For example,
+
+    trace ()
+
+might print a trace like this
+
+    1: Start    AttrEval (attribute,decl) (parameter,None) (subject,Use(int))
+    2: Start    AttrEval (attribute,lookup) (parameter,Some(int)) (subject,Use(int))
+    3: Start    AttrEval (attribute,lookup) (parameter,Some(int)) (subject,VarDecl(Use(int),y))
+    4: Start    AttrEval (attribute,declarationOf) (parameter,Some(int)) (subject,VarDecl(Use(int),y))
+    4: Finish            (cached,false) (value,null)
+    ...
+
+If you just want to see the `Start` events you can use a predicate as follows:
+
+    trace (_.kind == Events.Start)
 
 Using the library from Java
 ===========================

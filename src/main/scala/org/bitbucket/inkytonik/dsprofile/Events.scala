@@ -53,6 +53,13 @@ object Events {
             uid
         }
 
+        /**
+         * Reset the seed to zero.
+         */
+        def reset () {
+            uid = 0
+        }
+
     }
 
     /**
@@ -97,7 +104,7 @@ object Events {
     /**
      * Base class of profiling events.
      */
-    class Event (val id: Long, val kind : EventKind, dimPairs : DimPair*) {
+    class Event (val id : Long, val kind : EventKind, dimPairs : DimPair*) {
 
         /**
          * The dimensions of this event.
@@ -109,6 +116,21 @@ object Events {
          * The time in milliseconds when this event was created.
          */
         val time = nanoTime
+
+        /**
+         * Render an event in a readable fashion. Dimensions are canonicalised
+         * by puting the `event` dimension first (if present) and sorting the
+         * rest.
+         */
+        lazy val renderedString : String = {
+            val eventDimension = dimensions.getOrElse ("event", "")
+            val nonEventDimensions = dimensions - "event"
+            val sortedDimensions = nonEventDimensions.map (_.toString).toArray.sorted
+            "%5d: %-6s %10s %s".format (id, kind, eventDimension, sortedDimensions.mkString (" "))
+        }
+
+        override def toString : String =
+            renderedString
 
     }
 
@@ -122,6 +144,7 @@ object Events {
      */
     def reset () {
         events.clear ()
+        uniqueId.reset ()
     }
 
     /**

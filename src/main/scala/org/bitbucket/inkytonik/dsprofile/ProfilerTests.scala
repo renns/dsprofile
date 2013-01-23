@@ -114,7 +114,7 @@ class ProfilerTests extends Profiler
         totalShouldBe (1500, "20", otp, 5.0)
     }
 
-    test("attribute-like profile") {
+    test ("attribute-like profile") {
         otp = ""
         case class AttrEval ()
         profileStart ()
@@ -154,6 +154,47 @@ class ProfilerTests extends Profiler
         val reporter = profileStop ()
         reporter (Seq ("attribute"))
         countShouldBe (3, "lookup", otp, 0.0)
+    }
+
+    test ("traces contain appropriate events") {
+        case class AttrEval ()
+        profileStart ()
+        val i = start ("event" -> AttrEval, "subject" -> "Use(int)", "attribute" -> "decl", "parameter" -> None)
+        val j = start ("event" -> AttrEval, "subject" -> "Use(int)", "attribute" -> "lookup", "parameter" -> Some("int"))
+        val k = start ("event" -> AttrEval, "subject" -> "VarDecl(Use(int),y)", "attribute" -> "lookup", "parameter" -> Some("int"))
+        val l = start ("event" -> AttrEval, "subject" -> "VarDecl(Use(int),y)", "attribute" -> "declarationOf", "parameter" -> Some("int"))
+        finish (l, "value"->null, "cached" -> false)
+        val m = start ("event" -> AttrEval, "subject" -> "VarDecl(Use(AA),a)", "attribute" -> "declarationOf", "parameter" -> Some("int"))
+        finish (m, "value" -> null, "cached" -> false)
+        finish (k, "value" -> null, "cached" -> false)
+        finish (j, "value" -> null, "cached" -> true)
+        finish (i, "value" -> null, "cached" -> true)
+        profileStop ()
+
+        otp = ""
+        trace ()
+        val fullTrace = """    1: Start    AttrEval (attribute,decl) (parameter,None) (subject,Use(int))
+            |    2: Start    AttrEval (attribute,lookup) (parameter,Some(int)) (subject,Use(int))
+            |    3: Start    AttrEval (attribute,lookup) (parameter,Some(int)) (subject,VarDecl(Use(int),y))
+            |    4: Start    AttrEval (attribute,declarationOf) (parameter,Some(int)) (subject,VarDecl(Use(int),y))
+            |    4: Finish            (cached,false) (value,null)
+            |    5: Start    AttrEval (attribute,declarationOf) (parameter,Some(int)) (subject,VarDecl(Use(AA),a))
+            |    5: Finish            (cached,false) (value,null)
+            |    3: Finish            (cached,false) (value,null)
+            |    2: Finish            (cached,true) (value,null)
+            |    1: Finish            (cached,true) (value,null)
+            |""".stripMargin
+        expectResult (fullTrace, "full trace") (otp)
+
+        otp = ""
+        trace (_.kind == Events.Start)
+        val startTrace = """    1: Start    AttrEval (attribute,decl) (parameter,None) (subject,Use(int))
+            |    2: Start    AttrEval (attribute,lookup) (parameter,Some(int)) (subject,Use(int))
+            |    3: Start    AttrEval (attribute,lookup) (parameter,Some(int)) (subject,VarDecl(Use(int),y))
+            |    4: Start    AttrEval (attribute,declarationOf) (parameter,Some(int)) (subject,VarDecl(Use(int),y))
+            |    5: Start    AttrEval (attribute,declarationOf) (parameter,Some(int)) (subject,VarDecl(Use(AA),a))
+            |""".stripMargin
+        expectResult (startTrace, "start trace") (otp)
     }
 
 }
