@@ -88,14 +88,13 @@ trait Profiler extends Values {
     def profileStopInteractive () {
         val profiler = profileStop ()
         println ("Profiler: enter a comma-separated list of dimension names, then enter (:q to exit)")
-        // source: http://stackoverflow.com/questions/4585655/scala-read-from-standard-input-line-by-line
         var ok = true
         while (ok) {
             print ("> ")
             val ln = readLine ()
             ok = ln != ":q"
             if (ok)
-                profiler (ln.split (","))
+                profiler ((ln.split (",")).map{_.trim()})
         }
     }
 
