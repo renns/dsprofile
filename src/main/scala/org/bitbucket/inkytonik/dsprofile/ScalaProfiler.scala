@@ -2,6 +2,7 @@
  * This file is part of dsprofile.
  *
  * Copyright (C) 2012-2013 Anthony M Sloane, Macquarie University.
+ * Copyright (C) 2012-2013 Matthew Roberts, Macquarie University.
  *
  * dsprofile is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the
@@ -36,7 +37,7 @@ object ScalaProfiler extends Profiler {
         Events.start (dimPairs : _*)
     }
 
-    def finish (i: Long, dimPairs : Array[DimPair]) {
+    def finish (i : Long, dimPairs : Array[DimPair]) {
         Events.finish (i, dimPairs : _*)
     }
 

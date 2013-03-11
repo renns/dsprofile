@@ -2,6 +2,7 @@
  * This file is part of dsprofile.
  *
  * Copyright (C) 2012-2013 Anthony M Sloane, Macquarie University.
+ * Copyright (C) 2012-2013 Matthew Roberts, Macquarie University.
  *
  * dsprofile is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the
@@ -87,10 +88,10 @@ trait Profiler extends Values {
      */
     def profileStopInteractive () {
         val profiler = profileStop ()
-        println ("Profiler: enter a comma-separated list of dimension names, then enter (:q to exit)")
+        outputln ("Profiler: enter a comma-separated list of dimension names, then enter (:q to exit)")
         var ok = true
         while (ok) {
-            print ("> ")
+            output ("> ")
             val ln = readLine ()
             ok = ln != ":q"
             if (ok)
@@ -161,9 +162,8 @@ trait Profiler extends Values {
         val records = allDescsStack.pop ().result ()
 
         // Make a function that can print reports when given dimension names
-        {dimensionNames : Seq[Dimension] =>
-          printReports (totalTime, dimensionNames, records)
-        }
+        (dimensionNames : Seq[Dimension]) =>
+            printReports (totalTime, dimensionNames, records)
     }
 
     /**

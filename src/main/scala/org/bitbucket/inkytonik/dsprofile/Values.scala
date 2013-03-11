@@ -2,6 +2,7 @@
  * This file is part of dsprofile.
  *
  * Copyright (C) 2012-2013 Anthony M Sloane, Macquarie University.
+ * Copyright (C) 2012-2013 Matthew Roberts, Macquarie University.
  *
  * dsprofile is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the
@@ -138,7 +139,8 @@ trait Values {
     }
 
     /**
-     * Send string and a newline to the profile output.
+     * Send string and a newline to the profile output. Default: print an
+     * empty line.
      */
     def outputln (str : String = "") {
         System.err.println (str)
