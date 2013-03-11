@@ -44,8 +44,8 @@ directory under a sub-directory for the Scala version that is being used.
 E.g., if the Scala version is 2.10, look in `target/scala_2.10` for
 `dsprofile_2.10-VERSION.jar` where `VERSION` is the dsprofile library version.
 
-Version 0.1.0 has been tested with sbt 0.12.0, Scala 2.10.0-M7 and Java
-1.7.0_06 running on Mac OS X 10.8.1.
+Version 0.2.0 has been tested with sbt 0.12.2, Scala 2.10.0 and Java
+1.7.0_11 running on Mac OS X 10.8.2.
 
 Using the library from Scala
 ============================
@@ -89,9 +89,9 @@ At the point when an interesting execution region has completed, the program
 code should call the `Events.finish` method. As for the `start` method, the
 `finish` method takes as its parameters some dimensions of the event that has
 just finished. The finish call may have whatever dimensions it likes, which
-are usually used to pass information that is only
-known once the evaluation has finished, or could be used to record the changes in
-dimensions during the event being captured.
+are usually used to pass information that is only known once the evaluation
+has finished, or could be used to record the changes in dimensions during
+the event being captured.
 
 For example, in the attribute evaluation case, we might call `finish`
 as follows.
@@ -106,6 +106,18 @@ occurrence has been fully evaluated. As before, the value `v` is an arbitrary
 object that is the attribute value. The `cached` dimension is a Boolean that
 indicates whether the value of the attribute was obtained from its cache or
 not.
+
+The `wrap` method can be used to do a `start`, run some code and then do a
+`finish` all in one go.
+For example,
+
+    wrap ("foo" -> 1, "bar" -> 2) {
+        ... some code ...
+    }
+
+will run the code in the block argument wrapped in `start` with the
+provided dimensions and dimension values, and a `finish` with no
+dimensions.
 
 The other main entry point for the library is the `Profiler.profile` method.
 It should be called with the first argument being the computation that you
@@ -182,7 +194,7 @@ instead and will print the value as a footnote after all of the tables have
 been printed. Thus, the dimension could be something such as a tree node which
 might be printed in full or pretty-printed.
 
-Alternately, `profileStart()` can be called to begin profiling and `profileStop`
+Alternately, `profileStart` can be called to begin profiling and `profileStop`
 called to complete the profile.  `profileStop` can be passed dimensions for the
 profile report in the same way as `profile` (but they must be passed in a sequence
 like a list).  For example
@@ -194,20 +206,21 @@ like a list).  For example
 
 It is also possible to defer the generation of the report when using `profileStart`
 and `profileStop` by not passing in the dimensions to profile.  In this case
-`profileStop` will return a closure which will print a report upon you giving it
+`profileStop` will return a closure that will print a report upon you giving it
 the dimensions to profile.  This allows you to print the profile at a later time
-or to print it multiple times for different dimension sets, for example
+or to print it multiple times for different dimension sets, for example.
 
     profileStart ()
     val i = Events.start ("type" -> "the_type")
     val j = Events.start ("style" -> "much")
-    Events.finish (ident)
+    Events.finish (j)
+    Events.finish (i)
     val reporter = profileStop ()
     reporter (Seq ("type"))
     reporter (Seq ("style"))
 
 `Profiler.trace` can be used to obtain a simple trace of the events. It takes
-a single parameter which is a predicate on events. If the parameter is omitted
+a single parameter that is a predicate on events. If the parameter is omitted
 it defaults to a predicate that is always true. For example,
 
     trace ()
@@ -231,6 +244,11 @@ Using the library from Java
 The dsprofile library can also be used from Java code. To make this more
 convenient, some bridge types and methods are used to communicate with
 the library implementation in Scala.
+
+Note: unfortunately, we do not currently have resources to maintain the
+Java API to be in sync with the Scala one.
+If a Scala API feature is something you wish to use from Java and can't,
+please let us know and we will see what we can do.
 
 The following code shows a simple Java program and how the profiler can be
 used from it using these bridges.
