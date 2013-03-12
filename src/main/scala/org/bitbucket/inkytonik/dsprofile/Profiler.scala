@@ -42,24 +42,17 @@ trait Profiler extends Values {
 
     /**
      * Process a profiling command-line option value. By convention we use the
-     * -p option to introduce this value, but that is not checked here and the
+     * `-p` option to introduce this value, but that is not checked here and the
      * option itself should not be present in the value. The option value is
-     * interpreted as a colon-separated list of dimension names. The list of
-     * names is returned.
+     * interpreted as a comma-separated list of dimension names. The list of
+     * names is returned. If the inupt value is the empty strnig, we return an
+     * empty sequence, not a sequence containing an empty string.
      */
     def parseProfileOption (value : String) : Seq[Dimension] =
-        value.split (":").toSeq
-
-    /**
-     * Run a computation under the control of the profiler. Print the requested
-     * report and return the value of the computation.
-     */
-    def profileReports[T] (computation : => T, dimensionNames : Seq[Dimension]) : T = {
-        profileStart ()
-        val computedResult = computation
-        profileStop (dimensionNames)
-        computedResult
-    }
+        if (value.isEmpty)
+            Seq ()
+        else
+            value.split (",").toSeq
 
     /**
      * Start profiling by turning on the profiling system, resetting the events
@@ -167,10 +160,18 @@ trait Profiler extends Values {
     }
 
     /**
-     * Profile `computation` along the given dimensions.
+     * Profile `computation` along the given dimensions and produce reports.
+     * If `dimensionsNames` is empty, run the computation and then enter an
+     * interactive shell to allow reports to be produced.
      */
     def profile[T] (computation : => T, dimensionNames : Dimension*) : T = {
-        profileReports (computation, dimensionNames)
+        profileStart ()
+        val computedResult = computation
+        if (dimensionNames.isEmpty)
+            profileStopInteractive ()
+        else
+            profileStop (dimensionNames)
+        computedResult
     }
 
     /**

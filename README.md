@@ -194,6 +194,11 @@ instead and will print the value as a footnote after all of the tables have
 been printed. Thus, the dimension could be something such as a tree node which
 might be printed in full or pretty-printed.
 
+If `profile` is called without any dimensions, the library will enter an
+interactive shell after the computation has finished. You can generate
+a report in the shell by entering dimension names separated by commas.
+Type `:q` to exit.
+
 Alternately, `profileStart` can be called to begin profiling and `profileStop`
 called to complete the profile.  `profileStop` can be passed dimensions for the
 profile report in the same way as `profile` (but they must be passed in a sequence
