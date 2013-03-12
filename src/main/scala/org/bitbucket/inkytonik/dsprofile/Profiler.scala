@@ -545,6 +545,30 @@ trait Profiler extends Values {
 
     }
 
+    /**
+     * Given a record, an event type and a dimension name, return the value of
+     * the record at that dimension. This implementation provides standard
+     * derived dimensions and defaults to just looking up intrinsic dimensions.
+     * The supported derived dimensions are: `type` (the prefix of a Product
+     * given by the record's `subject` dimension).
+     */
+    override def dimValue (record : Record, dim : Dimension) : Value =
+        dim match {
+
+            // `type` dimension is the node type of the record's subject.
+            case "type" =>
+                checkFor (record, dim, "", "subject") {
+                    case p : Product => p.productPrefix
+                    case _           => "unknown type"
+                }
+
+            // Otherwise, dispatch to the value to handle it as an intrinsic
+            // dimension
+            case _ =>
+                super.dimValue (record, dim)
+
+        }
+
 }
 
 /**

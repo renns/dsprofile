@@ -52,10 +52,9 @@ trait Values {
 
     /**
      * Given a record, an event type and a dimension name, return the value of
-     * the record at that dimension, if the record represents an event of the
-     * given type. By default, the name is just looked up in the record's
-     * intrinsic dimensions. If the dimension is not known, an error message
-     * string is returned as the value. Override this method to add derived
+     * the record at that dimension. By default, the name is just looked up in
+     * the record's intrinsic dimensions. If the dimension is not known, an error
+     * message string is returned as the value. Override this method to add derived
      * dimensions or to change the interpretation of intrinsic ones.
      */
     def dimValue (record : Record, dim : Dimension) : Value =
@@ -77,12 +76,13 @@ trait Values {
      * Check for an intrinsic dimension `needed` on `record`, while looking for
      * a value of the derived dimension `dim`. If `needed` is found, get its value
      * and pass it to `f`, using the `f`'s return value as the value of the `dim`
-     * dimension. Otherwise, use `error` to report the missing dimension.
+     * dimension. Otherwise, use `error` to report the missing dimension. If
+     * `eventtype` is empty, accept any event.
      */
     def checkFor (record : Record, dim : Dimension, eventtype : String,
                   needed : Dimension) (f : Value => Value) : Value =
         if (record.dimensions contains "event")
-            if (record.dimensions ("event") == eventtype)
+            if (eventtype.isEmpty || (record.dimensions ("event") == eventtype))
                 if (record.dimensions contains needed)
                     f (record.dimensions (needed))
                 else

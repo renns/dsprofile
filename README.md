@@ -119,6 +119,9 @@ will run the code in the block argument wrapped in `start` with the
 provided dimensions and dimension values, and a `finish` with no
 dimensions.
 
+profile
+=======
+
 The other main entry point for the library is the `Profiler.profile` method.
 It should be called with the first argument being the computation that you
 want to profile. This argument is passed by name to the `profile` method so it
@@ -199,6 +202,9 @@ interactive shell after the computation has finished. You can generate
 a report in the shell by entering dimension names separated by commas.
 Type `:q` to exit.
 
+Lower-level usage
+=================
+
 Alternately, `profileStart` can be called to begin profiling and `profileStop`
 called to complete the profile.  `profileStop` can be passed dimensions for the
 profile report in the same way as `profile` (but they must be passed in a sequence
@@ -224,6 +230,9 @@ or to print it multiple times for different dimension sets, for example.
     reporter (Seq ("type"))
     reporter (Seq ("style"))
 
+Tracing
+=======
+
 `Profiler.trace` can be used to obtain a simple trace of the events. It takes
 a single parameter that is a predicate on events. If the parameter is omitted
 it defaults to a predicate that is always true. For example,
@@ -242,6 +251,48 @@ might print a trace like this
 If you just want to see the `Start` events you can use a predicate as follows:
 
     trace (_.kind == Events.Start)
+
+Adding your own dimensions
+==========================
+
+The dimensions used above such as `attribute` and `cached` are called
+_intrinsic dimensions_ because they are part of the profiling records.
+The library also supports _derived dimensions_ which are calculated from
+the record.
+Derived dimensions allow you to tailor the profiles to show domain-specific
+information, or perhaps even problem-specific information if you are using
+profiles to track down a problem.
+
+To define your own derived dimensions, override the `dimValue` method of
+the profiler as shown in this example.
+
+    override def dimValue (record : Record, dim : Dimension) : Value =
+        dim match {
+
+            // `type` dimension is the node type of the record's subject.
+            case "type" =>
+                checkFor (record, dim, "", "subject") {
+                    case p : Product => p.productPrefix
+                    case _           => "unknown type"
+                }
+
+            // Otherwise, dispatch to the value to handle it as an intrinsic
+            // dimension
+            case _ =>
+                super.dimValue (record, dim)
+
+        }
+
+The arguments are a profile record and the dimension name.
+`dimValue` must examine the dimension name and the record to return a value
+(which is just a string).
+If the dimension is not supported, call the superclass implementation which
+will provide default behaviour.
+
+In the example, we define a `type` dimension that is the prefix of the
+`Product` node that is the value of an intrinsic `subject` dimension.
+The `checkFor` method allows you to easily check for the presence of needed
+intrinsic dimensions. `type` is provided by the default `Profiler`.
 
 Using the library from Java
 ===========================
