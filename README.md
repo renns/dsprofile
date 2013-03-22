@@ -30,10 +30,7 @@ Building the library
 Using a pre-built jar file should be sufficient, but if you want to build
 the library, first clone this repository using Mercurial.
 
-Download and install the Scala simple build tool:
-
-    https://github.com/harrah/xsbt/wiki/
-
+Download and install the [Scala simple build tool](http://www.scala-sbt.org).
 
 Run `sbt package` in the top-level of the project. sbt will download all the
 necessary Scala compiler and library jars, build the library, and package it
