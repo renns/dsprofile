@@ -2,13 +2,13 @@
 
 name := "dsprofile"
 
-version := "0.2.0-SNAPSHOT"
+version := "0.2.0"
 
 organization := "org.bitbucket.inkytonik.dsprofile"
 
 // Scala compiler settings
 
-scalaVersion := "2.10.0"
+scalaVersion := "2.10.1"
 
 crossScalaVersions := Seq ("2.9.3", "2.10.0")
 
@@ -24,15 +24,7 @@ scalacOptions in Compile <<= (scalaVersion, scalacOptions) map {
         options ++ versionOptions
 }
 
-scalacOptions in Test <<= (scalaVersion, scalacOptions) map {
-    (version, options) =>
-        val versionOptions =
-            if (version.startsWith ("2.10"))
-                Seq ("-feature")
-            else
-                Seq ()
-        options ++ versionOptions
-}
+scalacOptions in Test <<= scalacOptions in Compile
 
 // Migration manager (mima)
 
@@ -82,51 +74,49 @@ parallelExecution in Test := false
 
 // Link the documentation to the source in the main repository
 
-// FIXME
-// scalacOptions in (Compile, doc) <++= baseDirectory map {
-//     bd => Seq (
-//         "-sourcepath",
-//             bd.getAbsolutePath,
-//         "-doc-source-url",
-//             "https://code.google.com/p/kiama/source/browse€{FILE_PATH}.scala"
-//     )
-// }
+scalacOptions in (Compile, doc) <++= baseDirectory map {
+    bd => Seq (
+        "-sourcepath",
+            bd.getAbsolutePath,
+        "-doc-source-url",
+            "https://bitbucket.org/inkytonik/dsprofile/src/default€{FILE_PATH}.scala"
+    )
+}
 
 // Publishing
 
-// FIXME
-// publishTo <<= version { v =>
-//     val nexus = "https://oss.sonatype.org/"
-//     if (v.trim.endsWith ("SNAPSHOT"))
-//         Some ("snapshots" at nexus + "content/repositories/snapshots")
-//     else
-//         Some ("releases" at nexus + "service/local/staging/deploy/maven2")
-// }
-//
-// publishMavenStyle := true
-//
-// publishArtifact in Test := true
-//
-// pomIncludeRepository := { x => false }
-//
-// pomExtra := (
-//     <url>http://kiama.googlecode.com</url>
-//     <licenses>
-//         <license>
-//             <name>LGPL 3.0 license</name>
-//             <url>http://www.opensource.org/licenses/lgpl-3.0.html</url>
-//             <distribution>repo</distribution>
-//         </license>
-//     </licenses>
-//     <scm>
-//         <url>https://kiama.googlecode.com/hg</url>
-//         <connection>scm:hg:https://kiama.googlecode.com/hg</connection>
-//     </scm>
-//     <developers>
-//         <developer>
-//            <id>inkytonik</id>
-//            <name>Tony Sloane</name>
-//            <url>https://code.google.com/u/inkytonik</url>
-//         </developer>
-//     </developers>
-// )
+publishTo <<= version { v =>
+    val nexus = "https://oss.sonatype.org/"
+    if (v.trim.endsWith ("SNAPSHOT"))
+        Some ("snapshots" at nexus + "content/repositories/snapshots")
+    else
+        Some ("releases" at nexus + "service/local/staging/deploy/maven2")
+}
+
+publishMavenStyle := true
+
+publishArtifact in Test := true
+
+pomIncludeRepository := { x => false }
+
+pomExtra := (
+    <url>https://bitbucket.org/inkytonik/dsprofile</url>
+    <licenses>
+        <license>
+            <name>LGPL 3.0 license</name>
+            <url>http://www.opensource.org/licenses/lgpl-3.0.html</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <scm>
+        <url>https://bitbucket.org/inkytonik/dsprofile</url>
+        <connection>scm:hg:https://bitbucket.org/inkytonik/dsprofile</connection>
+    </scm>
+    <developers>
+        <developer>
+           <id>inkytonik</id>
+           <name>Tony Sloane</name>
+           <url>https://bitbucket.org/inkytonik</url>
+        </developer>
+    </developers>
+)
