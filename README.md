@@ -18,11 +18,11 @@ files `COPYING` and `COPYING.LESSER` for details.
 Downloading the library
 =======================
 
-Pre-built jar files for the library are available via the Download section of
-this site.
+The library is published in the Maven Central repository.
+If you are using sbt you should include the following in your library
+dependencies:
 
-We expect to publish the library in the Maven Central repository at some
-point.
+    "org.bitbucket.inkytonik.dsprofile" %% "dsprofile" % "0.2.0"
 
 Building the library
 ====================
