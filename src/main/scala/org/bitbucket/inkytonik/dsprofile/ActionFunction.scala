@@ -21,6 +21,9 @@
 
 package org.bitbucket.inkytonik.dsprofile
 
+/**
+ * Simple callable action used by the Scala profiler entry point via arrays.
+ */
 class ActionFunction (action : Action) extends Function0[Unit] {
 
     def apply () {
