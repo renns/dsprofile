@@ -49,6 +49,7 @@ class EventsTests extends FunSuite with BeforeAndAfter {
     }
 
     test ("test event ids are unique") {
+        Events.profiling = true
         expectResult (1000) {
             ((((1 to 1000).toList).map {i => Events.start ()}).toSet).size
         }

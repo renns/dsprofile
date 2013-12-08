@@ -37,6 +37,16 @@ object Events {
     var profiling = false
 
     /**
+     * Flag to control whether received events are logged to standard
+     * error or not. This option provides a way to get step-by-step
+     * information about the computation. It is also possible to use the
+     * profiler's `trace` facility, but that only works if the profiled
+     * computation terminates. Logging can be used for computations that
+     * are long running or end up in inifinite loops.
+     */
+    var logging = false
+
+    /**
      * Supply of unique event identifiers.
      */
     private object uniqueId {
@@ -153,10 +163,16 @@ object Events {
      */
     @inline
     def start (dimPairs : DimPair*) : Long = {
-        val i = uniqueId ()
-        if (profiling)
-            events += new Event (i, Start, dimPairs : _*)
-        i
+        if (profiling || logging) {
+            val i = uniqueId ()
+            val event = new Event (i, Start, dimPairs : _*)
+            if (profiling)
+                events += event
+            if (logging)
+                println (event.toString)
+            i
+        } else
+            0
     }
 
     /**
@@ -165,8 +181,13 @@ object Events {
      */
     @inline
     def finish (i : Long, dimPairs : DimPair*) {
-        if (profiling)
-            events += new Event (i, Finish, dimPairs : _*)
+        if (profiling || logging) {
+            val event = new Event (i, Finish, dimPairs : _*)
+            if (profiling)
+                events += event
+            if (logging)
+                println (event.toString)
+        }
     }
 
     /**

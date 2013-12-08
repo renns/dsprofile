@@ -227,12 +227,13 @@ or to print it multiple times for different dimension sets, for example.
     reporter (Seq ("type"))
     reporter (Seq ("style"))
 
-Tracing
-=======
+Tracing and Logging
+===================
 
-`Profiler.trace` can be used to obtain a simple trace of the events. It takes
-a single parameter that is a predicate on events. If the parameter is omitted
-it defaults to a predicate that is always true. For example,
+`Profiler.trace` can be used to obtain a simple trace of the events that have
+already been collected by a profiling run. `trace` takes a single parameter
+that is a predicate on events. If the parameter is omitted it defaults to a
+predicate that is always true. For example,
 
     trace ()
 
@@ -248,6 +249,12 @@ might print a trace like this
 If you just want to see the `Start` events you can use a predicate as follows:
 
     trace (_.kind == Events.Start)
+
+If the computation you are profiling is long-running or does not terminate,
+tracing is not useful since it relies on having a complete event trace.
+Instead, `Events.logging` can be turned on to request each event to be logged
+to standard error as it is generated. There is currently no way to select a
+subset of events to be logged.
 
 Adding your own dimensions
 ==========================
