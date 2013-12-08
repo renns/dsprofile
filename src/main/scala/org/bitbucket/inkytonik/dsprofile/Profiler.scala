@@ -56,10 +56,12 @@ trait Profiler extends Values {
 
     /**
      * Start profiling by turning on the profiling system, resetting the events
-     * buffer and recording the start time.
+     * buffer and recording the start time. The `logging` argument specifies
+     * whether event logging should be turned on or not (default: false).
      */
-    def profileStart () {
+    def profileStart (logging : Boolean = false) {
         Events.profiling = true
+        Events.logging = logging
 
         // Clear the event buffer
         Events.reset ()
@@ -101,6 +103,7 @@ trait Profiler extends Values {
         import scala.collection.mutable.Stack
 
         Events.profiling = false
+        Events.logging = false
 
         val totalTime = nanoTime - startTime
 
@@ -162,10 +165,13 @@ trait Profiler extends Values {
     /**
      * Profile `computation` along the given dimensions and produce reports.
      * If `dimensionsNames` is empty, run the computation and then enter an
-     * interactive shell to allow reports to be produced.
+     * interactive shell to allow reports to be produced. The `logging`
+     * argument specifies whether event logging should be turned on or not
+     * (default: false).
      */
-    def profile[T] (computation : => T, dimensionNames : Dimension*) : T = {
-        profileStart ()
+    def profile[T] (computation : => T, dimensionNames : Seq[Dimension],
+                    logging : Boolean = false) : T = {
+        profileStart (logging)
         val computedResult = computation
         if (dimensionNames.isEmpty)
             profileStopInteractive ()
