@@ -22,7 +22,9 @@
 package org.bitbucket.inkytonik.dsprofile
 
 /**
- * Entry points to profiling library from Scala.
+ * Entry points to profiling library from Scala via dimension arrays. Intended
+ * for use by Java entry points. If you are really coming from Scala use the
+ * main Profiler interface.
  */
 object ScalaProfiler extends Profiler {
 
