@@ -30,17 +30,17 @@ object ScalaProfiler extends Profiler {
 
     def profile (action : Action, dimensions : Array[String]) {
         val func = new ActionFunction (action)
-        super.profile (func (), dimensions.toSeq : _*)
+        super.profile (func (), dimensions.toIndexedSeq)
     }
 
     type DimPair = Tuple2[String,Any]
 
     def start (dimPairs : Array[DimPair]) : Long = {
-        Events.start (dimPairs : _*)
+        Events.start (dimPairs.toIndexedSeq)
     }
 
     def finish (i : Long, dimPairs : Array[DimPair]) {
-        Events.finish (i, dimPairs : _*)
+        Events.finish (i, dimPairs.toIndexedSeq)
     }
 
 }

@@ -57,12 +57,15 @@ We need a way to pass information from the evaluator execution and a way to
 trigger profiling reports to be printed.
 
 Information is passed to the profiler by calling the `start` and `finish`
-methods of the `Events` module. The parameters to the first of these messages are Scala
-tuples that describe the event that has occurred. For example, to indicate
-that an attribute evaluation has started, your code might call:
+methods of the `Events` module. The parameter to the first of these messages
+is a sequence of Scala tuples that describe the event that has occurred.
+For example, to indicate that an attribute evaluation has started, your code
+might call:
 
-    val ident = start ("event" -> "AttrEval", "subject" -> s, "attribute" -> a,
-                       "parameter" -> None)
+    import scala.collection.immutable.Seq
+
+    val ident = start (Seq ("event" -> "AttrEval", "subject" -> s, "attribute" -> a,
+                            "parameter" -> None))
 
 Each of the strings `"type"`, `"subject"` and so on is a _dimension_ and
 together they identify the particular event that has occurred. The second
@@ -71,6 +74,10 @@ in this particular occurrence. For example, the value `s` is assumed in the
 example to be a reference to the subject node of the evaluation; i.e., the
 syntax tree node whose attribute is being evaluated. Similarly, `a` is a value
 that refers to the attribute that is being evaluated.
+
+The tuple sequence is passed by name, so it will not be evaluated unless it
+is needed. It is therefore safe to include long-running computations in the
+tuples without incurring an overhead when profiling is not being used.
 
 The `start` method will return a unique identifier for this event, which you
 need to provide to the associated `finish` method.
@@ -84,31 +91,29 @@ that method is used by the library to print the values (see below).
 
 At the point when an interesting execution region has completed, the program
 code should call the `Events.finish` method. As for the `start` method, the
-`finish` method takes as its parameters some dimensions of the event that has
-just finished. The finish call may have whatever dimensions it likes, which
-are usually used to pass information that is only known once the evaluation
-has finished, or could be used to record the changes in dimensions during
-the event being captured.
+`finish` method takes as its parameters a sequence of dimensions of the event
+that has just finished. The finish call may have whatever dimensions it likes,
+which are usually used to pass information that is only known once the
+evaluation has finished, or could be used to record changes in dimensions
+during the event being captured.
 
 For example, in the attribute evaluation case, we might call `finish`
 as follows.
 
-    finish (ident, "value" -> v, "cached" -> false)
+    finish (ident, Seq ("value" -> v, "cached" -> false))
 
-We can see that the `ident` we were given earlier is passed in as the first argument and
-the remaining arguments are dimension tuples.  In this example,
-the new `"value"` and `"cached"` dimensions are
-given values here, because we only know what they are once the attribute
-occurrence has been fully evaluated. As before, the value `v` is an arbitrary
-object that is the attribute value. The `cached` dimension is a Boolean that
-indicates whether the value of the attribute was obtained from its cache or
-not.
+We can see that the `ident` we were given earlier is passed in as the first
+argument and the remaining arguments are dimension tuples.  In this example,
+the new `"value"` and `"cached"` dimensions are given values here, because
+we only know what they are once the attribute occurrence has been fully
+evaluated. As before, the value `v` is an arbitrary object that is the
+attribute value. The `cached` dimension is a Boolean that indicates whether
+the value of the attribute was obtained from its cache or not.
 
 The `wrap` method can be used to do a `start`, run some code and then do a
-`finish` all in one go.
-For example,
+`finish` all in one go. For example,
 
-    wrap ("foo" -> 1, "bar" -> 2) {
+    wrap (Seq ("foo" -> 1, "bar" -> 2)) {
         ... some code ...
     }
 
@@ -124,10 +129,10 @@ It should be called with the first argument being the computation that you
 want to profile. This argument is passed by name to the `profile` method so it
 will not be evaluated until necessary. The computation should call the `start`
 and `finish` methods as described above, but it can do any other computation
-as well. The second argument to `profile` is a list of the dimensions that you
-want to see in the profile report. For example, we might call
+as well. The second argument to `profile` is a sequence of the dimensions that
+you want to see in the profile report. For example, we might call
 
-    profile (c, "attribute", "cached")
+    profile (c, Seq ("attribute", "cached"))
 
 to profile the evaluation of `c` and print a report along two dimensions
 (first the attribute that was evaluated and then whether it was cached or

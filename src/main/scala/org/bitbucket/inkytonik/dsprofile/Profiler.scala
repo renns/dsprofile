@@ -29,6 +29,7 @@ trait Profiler extends Values {
     import Events._
     import java.lang.System.nanoTime
     import scala.collection.mutable.{HashMap, HashSet, ListBuffer}
+    import scala.collection.immutable.Seq
     import scala.math.{pow, sqrt}
 
     var startTime = nanoTime
@@ -52,7 +53,7 @@ trait Profiler extends Values {
         if (value.isEmpty)
             Seq ()
         else
-            value.split (",").toSeq
+            value.split (",").toIndexedSeq
 
     /**
      * Start profiling by turning on the profiling system, resetting the events
@@ -90,7 +91,7 @@ trait Profiler extends Values {
             val ln = readLine ()
             ok = ln != ":q"
             if (ok)
-                profiler ((ln.split (",")).map{_.trim()})
+                profiler ((ln.split (",")).map {_.trim()}.toIndexedSeq)
         }
     }
 

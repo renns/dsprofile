@@ -31,6 +31,7 @@ package org.bitbucket.inkytonik.dsprofile
 trait Values {
 
     import Events.{Dimension, Dimensions, Value}
+    import scala.collection.immutable.Seq
 
     /**
      * A record of execution of some particular type of action during profiling.

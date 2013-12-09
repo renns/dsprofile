@@ -25,6 +25,7 @@ object Events {
 
     import java.lang.System.nanoTime
     import scala.collection.mutable.ArrayBuffer
+    import scala.collection.immutable.Seq
 
     /**
      * Flag to control whether profiling data is stored or not. When this
@@ -115,7 +116,7 @@ object Events {
     /**
      * Base class of profiling events.
      */
-    class Event (val id : Long, val kind : EventKind, dimPairs : DimPair*) {
+    class Event (val id : Long, val kind : EventKind, dimPairs : Seq[DimPair]) {
 
         /**
          * The dimensions of this event.
@@ -160,12 +161,14 @@ object Events {
 
     /**
      * Generate a `Start` event with the given dimensions.
+     * The dimension values are supplied as a sequence that is
+     * not evaluated unless profiling or logging is being performed.
      */
     @inline
-    def start (dimPairs : DimPair*) : Long = {
+    def start (dimPairs : => Seq[DimPair] = Seq.empty) : Long = {
         if (profiling || logging) {
             val i = uniqueId ()
-            val event = new Event (i, Start, dimPairs : _*)
+            val event = new Event (i, Start, dimPairs)
             if (profiling)
                 events += event
             if (logging)
@@ -178,11 +181,13 @@ object Events {
     /**
      * Generate a `Finish` event which matches the start event
      * with the given id, and which has the given dimensions.
+     * The dimension values are supplied as a sequence that is
+     * not evaluated unless profiling or logging is being performed.
      */
     @inline
-    def finish (i : Long, dimPairs : DimPair*) {
+    def finish (i : Long, dimPairs : => Seq[DimPair] = Seq.empty) {
         if (profiling || logging) {
-            val event = new Event (i, Finish, dimPairs : _*)
+            val event = new Event (i, Finish, dimPairs)
             if (profiling)
                 events += event
             if (logging)
@@ -193,10 +198,12 @@ object Events {
     /**
      * Wrap an execution of `c` by a `Start` event defined by the dimension
      * values given by `dimPairs` and a corresponding `Finish` event with no
-     * extra dimension values.
+     * extra dimension values. The dimension values are supplied as a
+     * sequence that is not evaluated unless profiling or logging is being
+     * performed.
      */
-    def wrap[T] (dimPairs : DimPair*) (c : => T) : T = {
-        val i = start (dimPairs :_*)
+    def wrap[T] (dimPairs : => Seq[DimPair]) (c : => T) : T = {
+        val i = start (dimPairs)
         val r = c
         finish (i)
         r

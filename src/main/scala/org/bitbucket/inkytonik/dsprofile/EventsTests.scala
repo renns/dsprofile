@@ -25,12 +25,12 @@ import org.scalatest.{BeforeAndAfter, FunSuite}
 
 class EventsTests extends FunSuite with BeforeAndAfter {
 
+    import scala.collection.immutable.Seq
+
     before {
         Events.profiling = true
         Events.reset
-        val i = Events.start ( ("one", 1)
-                             , ("two", 2)
-                             )
+        val i = Events.start (Seq (("one", 1), ("two", 2)))
         Events.finish (i)
         Events.profiling = false
     }
@@ -60,7 +60,7 @@ class EventsTests extends FunSuite with BeforeAndAfter {
             val i = 1
         }
         Events.profiling = true
-        Events.wrap ("one" -> 10, "two" -> 20) {do_it}
+        Events.wrap (Seq ("one" -> 10, "two" -> 20)) {do_it}
         Events.profiling = false
         expectResult (4) {Events.events.result.length}
     }

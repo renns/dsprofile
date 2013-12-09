@@ -31,6 +31,8 @@ class ProfilerTests extends Profiler
                     with BeforeAndAfter
                     with ShouldMatchers {
 
+    import scala.collection.immutable.Seq
+
     var otp = ""
     override def output (str : String) {otp = otp + str}
     override def outputln (str : String) {otp = otp + str + "\n"}
@@ -60,11 +62,11 @@ class ProfilerTests extends Profiler
         otp = ""
         profileStart ()
 
-        val i = start ("won" -> 1, "too" -> 2)
+        val i = start (Seq ("won" -> 1, "too" -> 2))
         Thread.sleep (250)
         finish (i)
 
-        val j = start ("won" -> 10, "too" -> 20)
+        val j = start (Seq ("won" -> 10, "too" -> 20))
         Thread.sleep (250)
         finish (j)
 
@@ -79,13 +81,13 @@ class ProfilerTests extends Profiler
     test ("check slightly more complex result (test b)") {
         otp = ""
         profileStart ()
-        val i = start ("won" -> 1, "too" -> 2)
+        val i = start (Seq ("won" -> 1, "too" -> 2))
         Thread.sleep (250)
         finish (i)
-        val j = start ("won" -> 1, "too" -> 20)
+        val j = start (Seq ("won" -> 1, "too" -> 20))
         Thread.sleep (750)
         finish (j)
-        val k = start ("won" -> 1, "too" -> 20)
+        val k = start (Seq ("won" -> 1, "too" -> 20))
         Thread.sleep (750)
         finish (k)
         profileStop (Seq ("won"))
@@ -97,13 +99,13 @@ class ProfilerTests extends Profiler
     test ("test b on other dimension") {
         otp = ""
         profileStart ()
-        val i = start ("won" -> 1, "too" -> 2)
+        val i = start (Seq ("won" -> 1, "too" -> 2))
         Thread.sleep (250)
         finish (i)
-        val k = start ("won" -> 1, "too" -> 20)
+        val k = start (Seq ("won" -> 1, "too" -> 20))
         Thread.sleep (750)
         finish (k)
-        val j = start ("won" -> 1, "too" -> 20)
+        val j = start (Seq ("won" -> 1, "too" -> 20))
         Thread.sleep (750)
         finish (j)
         profileStop (Seq ("too"))
@@ -119,16 +121,16 @@ class ProfilerTests extends Profiler
         otp = ""
         case class AttrEval ()
         profileStart ()
-        val i = start ("event" -> AttrEval, "subject" -> "Use(int)", "attribute" -> "decl", "parameter" -> None)
-        val j = start ("event" -> AttrEval, "subject" -> "Use(int)", "attribute" -> "lookup", "parameter" -> Some("int"))
-        val k = start ("event" -> AttrEval, "subject" -> "VarDecl(Use(int),y)", "attribute" -> "lookup", "parameter" -> Some("int"))
-        val l = start ("event" -> AttrEval, "subject" -> "VarDecl(Use(int),y)", "attribute" -> "declarationOf", "parameter" -> Some("int"))
-        finish (l, "value"->null, "cached" -> false)
-        val m = start ("event" -> AttrEval, "subject" -> "VarDecl(Use(AA),a)", "attribute" -> "declarationOf", "parameter" -> Some("int"))
-        finish (m, "value" -> null, "cached" -> false)
-        finish (k, "value" -> null, "cached" -> false)
-        finish (j, "value" -> null, "cached" -> true)
-        finish (i, "value" -> null, "cached" -> true)
+        val i = start (Seq ("event" -> AttrEval, "subject" -> "Use(int)", "attribute" -> "decl", "parameter" -> None))
+        val j = start (Seq ("event" -> AttrEval, "subject" -> "Use(int)", "attribute" -> "lookup", "parameter" -> Some("int")))
+        val k = start (Seq ("event" -> AttrEval, "subject" -> "VarDecl(Use(int),y)", "attribute" -> "lookup", "parameter" -> Some("int")))
+        val l = start (Seq ("event" -> AttrEval, "subject" -> "VarDecl(Use(int),y)", "attribute" -> "declarationOf", "parameter" -> Some("int")))
+        finish (l, Seq ("value"->null, "cached" -> false))
+        val m = start (Seq ("event" -> AttrEval, "subject" -> "VarDecl(Use(AA),a)", "attribute" -> "declarationOf", "parameter" -> Some("int")))
+        finish (m, Seq ("value" -> null, "cached" -> false))
+        finish (k, Seq ("value" -> null, "cached" -> false))
+        finish (j, Seq ("value" -> null, "cached" -> true))
+        finish (i, Seq ("value" -> null, "cached" -> true))
         val reporter = profileStop ()
         reporter (Seq ("event"))
         reporter (Seq ("attribute"))
@@ -141,17 +143,17 @@ class ProfilerTests extends Profiler
     test ("that the finish dimension values override the start dimension values") {
         otp = ""
         profileStart ()
-        val i = start ("subject" -> "Use(int)", "attribute" -> "decl", "parameter" -> None)
-        val j = start ("subject" -> "Use(int)", "attribute" -> "lookup", "parameter" -> Some("int"))
-        val k = start ("subject" -> "VarDecl(Use(int),y)", "attribute" -> "lookup", "parameter" -> Some("int"))
-        val l = start ("subject" -> "VarDecl(Use(int),y)", "attribute" -> "declarationOf", "parameter" -> Some("int"))
-        finish (l, "value"->null, "cached" -> false)
-        val m = start ("subject" -> "VarDecl(Use(AA),a)", "attribute" -> "declarationOf", "parameter" -> Some("int"))
-        finish (m, "value" -> null, "cached" -> false)
-        finish (k, "value" -> null, "cached" -> false)
-        finish (j, "value" -> null, "cached" -> true)
+        val i = start (Seq ("subject" -> "Use(int)", "attribute" -> "decl", "parameter" -> None))
+        val j = start (Seq ("subject" -> "Use(int)", "attribute" -> "lookup", "parameter" -> Some("int")))
+        val k = start (Seq ("subject" -> "VarDecl(Use(int),y)", "attribute" -> "lookup", "parameter" -> Some("int")))
+        val l = start (Seq ("subject" -> "VarDecl(Use(int),y)", "attribute" -> "declarationOf", "parameter" -> Some("int")))
+        finish (l, Seq ("value"->null, "cached" -> false))
+        val m = start (Seq ("subject" -> "VarDecl(Use(AA),a)", "attribute" -> "declarationOf", "parameter" -> Some("int")))
+        finish (m, Seq ("value" -> null, "cached" -> false))
+        finish (k, Seq ("value" -> null, "cached" -> false))
+        finish (j, Seq ("value" -> null, "cached" -> true))
         // here we change the attribute dimension of the i event so that there are now three lookup attributes
-        finish (i, "attribute" -> "lookup", "value" -> null, "cached" -> true)
+        finish (i, Seq ("attribute" -> "lookup", "value" -> null, "cached" -> true))
         val reporter = profileStop ()
         reporter (Seq ("attribute"))
         countShouldBe (3, "lookup", otp, 0.0)
@@ -160,16 +162,16 @@ class ProfilerTests extends Profiler
     test ("traces contain appropriate events") {
         case class AttrEval ()
         profileStart ()
-        val i = start ("event" -> AttrEval, "subject" -> "Use(int)", "attribute" -> "decl", "parameter" -> None)
-        val j = start ("event" -> AttrEval, "subject" -> "Use(int)", "attribute" -> "lookup", "parameter" -> Some("int"))
-        val k = start ("event" -> AttrEval, "subject" -> "VarDecl(Use(int),y)", "attribute" -> "lookup", "parameter" -> Some("int"))
-        val l = start ("event" -> AttrEval, "subject" -> "VarDecl(Use(int),y)", "attribute" -> "declarationOf", "parameter" -> Some("int"))
-        finish (l, "value"->null, "cached" -> false)
-        val m = start ("event" -> AttrEval, "subject" -> "VarDecl(Use(AA),a)", "attribute" -> "declarationOf", "parameter" -> Some("int"))
-        finish (m, "value" -> null, "cached" -> false)
-        finish (k, "value" -> null, "cached" -> false)
-        finish (j, "value" -> null, "cached" -> true)
-        finish (i, "value" -> null, "cached" -> true)
+        val i = start (Seq ("event" -> AttrEval, "subject" -> "Use(int)", "attribute" -> "decl", "parameter" -> None))
+        val j = start (Seq ("event" -> AttrEval, "subject" -> "Use(int)", "attribute" -> "lookup", "parameter" -> Some("int")))
+        val k = start (Seq ("event" -> AttrEval, "subject" -> "VarDecl(Use(int),y)", "attribute" -> "lookup", "parameter" -> Some("int")))
+        val l = start (Seq ("event" -> AttrEval, "subject" -> "VarDecl(Use(int),y)", "attribute" -> "declarationOf", "parameter" -> Some("int")))
+        finish (l, Seq ("value"->null, "cached" -> false))
+        val m = start (Seq ("event" -> AttrEval, "subject" -> "VarDecl(Use(AA),a)", "attribute" -> "declarationOf", "parameter" -> Some("int")))
+        finish (m, Seq ("value" -> null, "cached" -> false))
+        finish (k, Seq ("value" -> null, "cached" -> false))
+        finish (j, Seq ("value" -> null, "cached" -> true))
+        finish (i, Seq ("value" -> null, "cached" -> true))
         profileStop ()
 
         otp = ""
