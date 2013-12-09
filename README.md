@@ -199,6 +199,10 @@ interactive shell after the computation has finished. You can generate
 a report in the shell by entering dimension names separated by commas.
 Type `:q` to exit.
 
+An optional Boolean third argument to `profile` allows logging to be turned
+on in the call. See the section `Tracing and Logging` for more information
+about logging.
+
 Lower-level usage
 =================
 
@@ -255,6 +259,11 @@ tracing is not useful since it relies on having a complete event trace.
 Instead, `Events.logging` can be turned on to request each event to be logged
 to standard error as it is generated. There is currently no way to select a
 subset of events to be logged.
+
+You can also turn logging on using the optional Boolean third argument to
+`Profiler.profile` as in
+
+    profile (c, Seq (...), true)
 
 Adding your own dimensions
 ==========================
