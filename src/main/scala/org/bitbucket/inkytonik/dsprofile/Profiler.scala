@@ -103,13 +103,22 @@ trait Profiler extends Values {
     def profileStop () : Seq[Dimension] => Unit = {
         import scala.collection.mutable.Stack
 
+        // Calculate total execution time to this point
+        val totalTime = nanoTime - startTime
+
+        // Reset the profiling system
         Events.profiling = false
         Events.logging = false
 
-        val totalTime = nanoTime - startTime
-
         // Get the final collection of events
         val allevents = Events.events.result ()
+
+        // Calculate overhead per record
+        val overheadPerRecord =
+            if (allevents.isEmpty)
+                0
+            else
+                Events.overhead / allevents.size / 2
 
         // Compute the execution records from the events
 
@@ -141,7 +150,8 @@ trait Profiler extends Values {
                             val dirDescs = dirDescsStack.pop ().result ()
                             val allDescs = allDescsStack.pop ().result ()
                             val dtime = allDescs.map (_.stime).sum
-                            val r = Record (e.time - es.time - dtime, (e.dimensions ++ es.dimensions)) (dirDescs, allDescs)
+                            val rtime = (e.time - es.time - dtime - overheadPerRecord) max 0L
+                            val r = Record (rtime, (e.dimensions ++ es.dimensions)) (dirDescs, allDescs)
                             dirDescsStack.top.append (r)
                             allDescsStack.top.appendAll (allDescs)
                             allDescsStack.top.append (r)

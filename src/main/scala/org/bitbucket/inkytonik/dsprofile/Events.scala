@@ -152,11 +152,18 @@ object Events {
     val events = new ArrayBuffer[Event] ()
 
     /**
+     * Overhead time spent while generating events. Will be amortised across all
+     * events when the profile is produced.
+     */
+    var overhead = 0L
+
+    /**
      * Reset the event buffer.
      */
     def reset () {
         events.clear ()
         uniqueId.reset ()
+        overhead = 0L
     }
 
     /**
@@ -166,6 +173,7 @@ object Events {
      */
     @inline
     def start (dimPairs : => Seq[DimPair] = Seq.empty) : Long = {
+        val startTime = nanoTime
         if (profiling || logging) {
             val i = uniqueId ()
             val event = new Event (i, Start, dimPairs)
@@ -173,6 +181,7 @@ object Events {
                 events += event
             if (logging)
                 println (event.toString)
+            overhead += nanoTime - startTime
             i
         } else
             0
@@ -186,12 +195,14 @@ object Events {
      */
     @inline
     def finish (i : Long, dimPairs : => Seq[DimPair] = Seq.empty) {
+        val startTime = nanoTime
         if (profiling || logging) {
             val event = new Event (i, Finish, dimPairs)
             if (profiling)
                 events += event
             if (logging)
                 println (event.toString)
+            overhead += nanoTime - startTime
         }
     }
 
