@@ -8,9 +8,9 @@ organization := "org.bitbucket.inkytonik.dsprofile"
 
 // Scala compiler settings
 
-scalaVersion := "2.10.1"
+scalaVersion := "2.10.3"
 
-crossScalaVersions := Seq ("2.9.3", "2.10.0")
+crossScalaVersions := Seq ("2.9.3", "2.10.2")
 
 scalacOptions := Seq ("-deprecation", "-unchecked")
 
