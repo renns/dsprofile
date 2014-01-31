@@ -8,19 +8,19 @@ organization := "org.bitbucket.inkytonik.dsprofile"
 
 // Scala compiler settings
 
-scalaVersion := "2.10.3"
+scalaVersion in ThisBuild := "2.11.0-M8"
 
-crossScalaVersions := Seq ("2.9.3", "2.10.2")
+scalaBinaryVersion in ThisBuild := "2.11.0-M8"
 
 scalacOptions := Seq ("-deprecation", "-unchecked")
 
 scalacOptions in Compile <<= (scalaVersion, scalacOptions) map {
     (version, options) =>
         val versionOptions =
-            if (version.startsWith ("2.10"))
-                Seq ("-feature")
-            else
+            if (version.startsWith ("2.9"))
                 Seq ()
+            else
+                Seq ("-feature")
         options ++ versionOptions
 }
 
@@ -47,7 +47,7 @@ shellPrompt <<= (name, version) { (n, v) =>
 libraryDependencies <++= scalaVersion {
     version =>
         Seq (
-            "org.scalatest" %% "scalatest" % "1.9.1" % "test"
+            "org.scalatest" %% "scalatest" % "2.1.RC1" % "test"
         )
 }
 
