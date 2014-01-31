@@ -30,6 +30,7 @@ trait Profiler extends Values {
     import java.lang.System.nanoTime
     import scala.collection.mutable.{HashMap, HashSet, ListBuffer}
     import scala.collection.immutable.Seq
+    import scala.io.ReadStdin.readLine
     import scala.math.{pow, sqrt}
 
     var startTime = nanoTime
