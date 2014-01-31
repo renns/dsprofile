@@ -23,13 +23,13 @@ package org.bitbucket.inkytonik.dsprofile
 
 import Events.{start, finish}
 
-import org.scalatest.{BeforeAndAfter, FunSuite}
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.{BeforeAndAfter, FunSuiteLike}
+import org.scalatest.Matchers
 
 class ProfilerTests extends Profiler
-                    with FunSuite
+                    with FunSuiteLike
                     with BeforeAndAfter
-                    with ShouldMatchers {
+                    with Matchers {
 
     import scala.collection.immutable.Seq
 
@@ -187,7 +187,7 @@ class ProfilerTests extends Profiler
             |    2: Finish            (cached,true) (value,null)
             |    1: Finish            (cached,true) (value,null)
             |""".stripMargin
-        expectResult (fullTrace, "full trace") (otp)
+        assertResult (fullTrace, "full trace") (otp)
 
         otp = ""
         trace (_.kind == Events.Start)
@@ -197,7 +197,7 @@ class ProfilerTests extends Profiler
             |    4: Start    AttrEval (attribute,declarationOf) (parameter,Some(int)) (subject,VarDecl(Use(int),y))
             |    5: Start    AttrEval (attribute,declarationOf) (parameter,Some(int)) (subject,VarDecl(Use(AA),a))
             |""".stripMargin
-        expectResult (startTrace, "start trace") (otp)
+        assertResult (startTrace, "start trace") (otp)
     }
 
 }

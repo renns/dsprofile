@@ -21,9 +21,9 @@
 
 package org.bitbucket.inkytonik.dsprofile
 
-import org.scalatest.{BeforeAndAfter, FunSuite}
+import org.scalatest.{BeforeAndAfter, FunSuiteLike}
 
-class EventsTests extends FunSuite with BeforeAndAfter {
+class EventsTests extends FunSuiteLike with BeforeAndAfter {
 
     import scala.collection.immutable.Seq
 
@@ -40,17 +40,17 @@ class EventsTests extends FunSuite with BeforeAndAfter {
     }
 
     test ("length is two") {
-        expectResult (2) {Events.events.result ().length}
+        assertResult (2) {Events.events.result ().length}
     }
 
     test ("length after reset") {
         Events.reset
-        expectResult (0) {Events.events.result ().length}
+        assertResult (0) {Events.events.result ().length}
     }
 
     test ("test event ids are unique") {
         Events.profiling = true
-        expectResult (1000) {
+        assertResult (1000) {
             ((((1 to 1000).toList).map {i => Events.start ()}).toSet).size
         }
     }
@@ -62,7 +62,7 @@ class EventsTests extends FunSuite with BeforeAndAfter {
         Events.profiling = true
         Events.wrap (Seq ("one" -> 10, "two" -> 20)) {do_it}
         Events.profiling = false
-        expectResult (4) {Events.events.result.length}
+        assertResult (4) {Events.events.result.length}
     }
 
 }
