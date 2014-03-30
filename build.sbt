@@ -1,6 +1,7 @@
-// Main settings
 
 name := "dsprofile"
+
+// Main settings
 
 version := "0.4.0-SNAPSHOT"
 
@@ -8,9 +9,9 @@ organization := "org.bitbucket.inkytonik.dsprofile"
 
 // Scala compiler settings
 
-scalaVersion in ThisBuild := "2.11.0-M8"
+scalaVersion := "2.11.0-RC3"
 
-scalaBinaryVersion in ThisBuild := "2.11.0-M8"
+scalaBinaryVersion := "2.11.0-RC3"
 
 scalacOptions := Seq ("-deprecation", "-unchecked")
 
@@ -47,7 +48,7 @@ shellPrompt <<= (name, version) { (n, v) =>
 libraryDependencies <++= scalaVersion {
     version =>
         Seq (
-            "org.scalatest" %% "scalatest" % "2.1.RC1" % "test"
+            "org.scalatest" %% "scalatest" % "2.1.2" % "test"
         )
 }
 
