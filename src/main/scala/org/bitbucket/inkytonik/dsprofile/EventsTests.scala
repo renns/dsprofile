@@ -56,7 +56,7 @@ class EventsTests extends FunSuiteLike with BeforeAndAfter {
     }
 
     test ("wrapper interface") {
-        def do_it {
+        def do_it () {
             val i = 1
         }
         Events.profiling = true
