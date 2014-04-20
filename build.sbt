@@ -3,15 +3,13 @@ name := "dsprofile"
 
 // Main settings
 
-version := "0.4.0-SNAPSHOT"
+version := "0.4.0"
 
 organization := "org.bitbucket.inkytonik.dsprofile"
 
 // Scala compiler settings
 
-scalaVersion := "2.11.0-RC4"
-
-scalaBinaryVersion := "2.11.0-RC4"
+scalaVersion := "2.11.0"
 
 scalacOptions := Seq ("-deprecation", "-unchecked")
 
