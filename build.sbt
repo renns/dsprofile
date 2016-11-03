@@ -9,7 +9,7 @@ organization := "org.bitbucket.inkytonik.dsprofile"
 
 // Scala compiler settings
 
-scalaVersion := "2.11.0"
+scalaVersion := "2.12.0"
 
 scalacOptions := Seq ("-deprecation", "-unchecked")
 
@@ -46,7 +46,7 @@ shellPrompt <<= (name, version) { (n, v) =>
 libraryDependencies <++= scalaVersion {
     version =>
         Seq (
-            "org.scalatest" %% "scalatest" % "2.1.3" % "test"
+            "org.scalatest" %% "scalatest" % "3.0.0" % "test"
         )
 }
 
