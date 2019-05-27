@@ -22,7 +22,7 @@ The library is published in the Maven Central repository.
 If you are using sbt you should include the following in your library
 dependencies:
 
-    "org.bitbucket.inkytonik.dsprofile" %% "dsprofile" % "0.2.0"
+    "org.bitbucket.inkytonik.dsprofile" %% "dsprofile" % "0.4.0"
 
 Building the library
 ====================
@@ -38,11 +38,8 @@ as a jar file.
 
 If all goes well, you should find the dsprofile library jar in the `target`
 directory under a sub-directory for the Scala version that is being used.
-E.g., if the Scala version is 2.10, look in `target/scala_2.10` for
-`dsprofile_2.10-VERSION.jar` where `VERSION` is the dsprofile library version.
-
-Version 0.2.0 has been tested with sbt 0.12.2, Scala 2.10.0 and Java
-1.7.0_11 running on Mac OS X 10.8.2.
+E.g., if the Scala version is 2.12, look in `target/scala_2.12` for
+`dsprofile_2.12-VERSION.jar` where `VERSION` is the dsprofile library version.
 
 Using the library from Scala
 ============================
@@ -411,4 +408,3 @@ The beginning part of the output produced by this program is as follows:
      Total Total  Self  Self  Desc  Desc Count Count
         ms     %    ms     %    ms     %           %
         17  84.8     3  17.9    13  66.9     1  10.0  18
-
