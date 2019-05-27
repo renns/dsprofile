@@ -9,21 +9,20 @@ organization := "org.bitbucket.inkytonik.dsprofile"
 
 // Scala compiler settings
 
-scalaVersion := "2.12.0"
+scalaVersion := "2.12.8"
 
 scalacOptions := Seq ("-deprecation", "-unchecked")
 
-scalacOptions in Compile <<= (scalaVersion, scalacOptions) map {
-    (version, options) =>
-        val versionOptions =
-            if (version.startsWith ("2.9"))
-                Seq ()
-            else
-                Seq ("-feature")
-        options ++ versionOptions
+scalacOptions in ThisBuild in Compile ++= {
+    val versionOptions =
+        if (scalaVersion.value.startsWith ("2.9"))
+            Seq ()
+        else
+            Seq ("-feature")
+    versionOptions
 }
 
-scalacOptions in Test <<= scalacOptions in Compile
+scalacOptions in Test := (scalacOptions in Compile).value
 
 // Migration manager (mima)
 
@@ -37,35 +36,31 @@ scalacOptions in Test <<= scalacOptions in Compile
 
 logLevel := Level.Info
 
-shellPrompt <<= (name, version) { (n, v) =>
-     _ => n + " " + v + "> "
+shellPrompt := {
+    state =>
+        Project.extract(state).currentRef.project + " " + version.value +
+            " " + scalaVersion.value + "> "
 }
 
 // Dependencies
 
-libraryDependencies <++= scalaVersion {
-    version =>
-        Seq (
-            "org.scalatest" %% "scalatest" % "3.0.0" % "test"
-        )
-}
+libraryDependencies ++= Seq (
+    "org.scalatest" %% "scalatest" % "3.0.8-RC4" % "test"
+)
 
 // No main class since dsprofile is a library
 
 mainClass := None
 
-scalaSource in Compile <<= baseDirectory { _ / "src" }
+scalaSource in Compile := baseDirectory.value / "src"
 
-scalaSource in Test <<= scalaSource in Compile
+scalaSource in Test := (scalaSource in Compile).value
 
-unmanagedSources in Test <<= (scalaSource in Test) map { s => {
-    (s ** "*Tests.scala").get
-}}
+unmanagedSources in Test :=
+    (((scalaSource in Test).value) ** "*Tests.scala").get
 
-unmanagedSources in Compile <<=
-    (scalaSource in Compile, unmanagedSources in Test) map { (s, tests) =>
-        ((s ** "*.scala") +++ (s ** "*.java") --- tests).get
-    }
+unmanagedSources in Compile :=
+    (((scalaSource in Compile).value ** "*.scala") +++ ((scalaSource in Compile).value ** "*.java") --- (unmanagedSources in Test).value).get
 
 parallelExecution in Test := false
 
@@ -73,20 +68,19 @@ parallelExecution in Test := false
 
 // Link the documentation to the source in the main repository
 
-scalacOptions in (Compile, doc) <++= baseDirectory map {
-    bd => Seq (
+scalacOptions in (Compile, doc) ++=
+    Seq (
         "-sourcepath",
-            bd.getAbsolutePath,
+            baseDirectory.value.getAbsolutePath,
         "-doc-source-url",
             "https://bitbucket.org/inkytonik/dsprofile/src/default€{FILE_PATH}.scala"
     )
-}
 
 // Publishing
 
-publishTo <<= version { v =>
+publishTo := {
     val nexus = "https://oss.sonatype.org/"
-    if (v.trim.endsWith ("SNAPSHOT"))
+    if (version.value.trim.endsWith ("SNAPSHOT"))
         Some ("snapshots" at nexus + "content/repositories/snapshots")
     else
         Some ("releases" at nexus + "service/local/staging/deploy/maven2")
