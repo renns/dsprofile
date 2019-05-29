@@ -28,7 +28,7 @@ package org.bitbucket.inkytonik.dsprofile
  */
 object ScalaProfiler extends Profiler {
 
-    def profile (action : Action, dimensions : Array[String]) {
+    def profile (action : Action, dimensions : Array[String]) : Unit = {
         val func = new ActionFunction (action)
         super.profile (func (), dimensions.toIndexedSeq)
     }
@@ -39,7 +39,7 @@ object ScalaProfiler extends Profiler {
         Events.start (dimPairs.toIndexedSeq)
     }
 
-    def finish (i : Long, dimPairs : Array[DimPair]) {
+    def finish (i : Long, dimPairs : Array[DimPair]) : Unit = {
         Events.finish (i, dimPairs.toIndexedSeq)
     }
 

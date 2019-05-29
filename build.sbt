@@ -11,6 +11,8 @@ organization := "org.bitbucket.inkytonik.dsprofile"
 
 scalaVersion := "2.12.8"
 
+crossScalaVersions := Seq ("2.12.8", "2.13.0-RC2")
+
 scalacOptions := Seq ("-deprecation", "-unchecked")
 
 scalacOptions in ThisBuild in Compile ++= {

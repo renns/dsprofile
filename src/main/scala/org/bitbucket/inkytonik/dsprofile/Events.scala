@@ -68,7 +68,7 @@ object Events {
         /**
          * Reset the seed to zero.
          */
-        def reset () {
+        def reset () : Unit = {
             uid = 0
         }
 
@@ -160,7 +160,7 @@ object Events {
     /**
      * Reset the event buffer.
      */
-    def reset () {
+    def reset () : Unit = {
         events.clear ()
         uniqueId.reset ()
         overhead = 0L
@@ -194,7 +194,7 @@ object Events {
      * not evaluated unless profiling or logging is being performed.
      */
     @inline
-    def finish (i : Long, dimPairs : => Seq[DimPair] = Seq.empty) {
+    def finish (i : Long, dimPairs : => Seq[DimPair] = Seq.empty) : Unit = {
         val startTime = nanoTime
         if (profiling || logging) {
             val event = new Event (i, Finish, dimPairs)

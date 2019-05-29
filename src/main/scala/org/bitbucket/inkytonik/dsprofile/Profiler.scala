@@ -61,7 +61,7 @@ trait Profiler extends Values {
      * buffer and recording the start time. The `logging` argument specifies
      * whether event logging should be turned on or not (default: false).
      */
-    def profileStart (logging : Boolean = false) {
+    def profileStart (logging : Boolean = false) : Unit = {
         Events.profiling = true
         Events.logging = logging
 
@@ -75,7 +75,7 @@ trait Profiler extends Values {
      * Stop profiling and generate a profile report for the given dimension
      * names.
      */
-    def profileStop (dimensionNames : Seq[Dimension]) {
+    def profileStop (dimensionNames : Seq[Dimension]) : Unit = {
         profileStop () (dimensionNames)
     }
 
@@ -83,7 +83,7 @@ trait Profiler extends Values {
      * Stop profiling and generate profile reports based on interactively
      * specified dimensions.
      */
-    def profileStopInteractive () {
+    def profileStopInteractive () : Unit = {
         val profiler = profileStop ()
         outputln ("Profiler: enter a comma-separated list of dimension names, then enter (:q to exit)")
         var ok = true
@@ -112,7 +112,7 @@ trait Profiler extends Values {
         Events.logging = false
 
         // Get the final collection of events
-        val allevents = Events.events.result ()
+        val allevents = Events.events
 
         // Calculate overhead per record
         val overheadPerRecord =
@@ -124,7 +124,7 @@ trait Profiler extends Values {
         // Compute the execution records from the events
 
         // Stack of the start events we have seen but for which we have not seen finish events
-        val startStack = new Stack[Event] ()
+        var startStack = List[Event] ()
 
         // Stacks of record lists to hold the records that have been created since each start
         // event on stack was seen. The dummy entries are there so that root records have
@@ -138,14 +138,15 @@ trait Profiler extends Values {
         for (e <- allevents) {
             e.kind match {
                 case Start =>
-                    startStack.push (e)
+                    startStack = e :: startStack
                     dirDescsStack.push (new ListBuffer[Record] ())
                     allDescsStack.push (new ListBuffer[Record] ())
                 case Finish =>
                     if (startStack.isEmpty)
                         sys.error ("profile: empty stack looking for Start event for " +
                                    e.kind + " " + e.dimensions)
-                    val es = startStack.pop ()
+                    val es = startStack.head
+                    startStack = startStack.tail
                     es.kind match {
                         case Start if (es.id == e.id) =>
                             val dirDescs = dirDescsStack.pop ().result ()
@@ -196,7 +197,7 @@ trait Profiler extends Values {
      * Print a trace of the events for which a given predicate is true. If the
      * predicate is omitted it defaults to one that is always true.
      */
-    def trace (predicate : Event => Boolean = (_ => true)) {
+    def trace (predicate : Event => Boolean = (_ => true)) : Unit = {
         events.map (event =>
             if (predicate (event))
                 outputln (event.toString)
@@ -209,12 +210,12 @@ trait Profiler extends Values {
      * biggest and smallest values are then discarded and the resulting values
      * are printed.
      */
-    def time[T] (computation : => T, warmup : Int = 10, n : Int = 24, discard : Int = 2) {
+    def time[T] (computation : => T, warmup : Int = 10, n : Int = 24, discard : Int = 2) : Unit = {
 
         /**
          * Print timing value summary information with mean, variance, max and min.
          */
-        def printTimings (a : Array[Long]) {
+        def printTimings (a : Array[Long]) : Unit = {
             outputln ("Num samples     = %d".format (n))
             outputln ("Warmup samples  = %d".format (warmup))
             outputln ("Discard samples = %d".format (discard))
@@ -294,7 +295,7 @@ trait Profiler extends Values {
      * Print the profiling report by summarising along the requested dimensions.
      * FIXME: avoid multiple passes through the data?
      */
-    def printReports (totalTime : Long, dimensionNames : Seq[Dimension], records : List[Record]) {
+    def printReports (totalTime : Long, dimensionNames : Seq[Dimension], records : List[Record]) : Unit = {
         if (dimensionNames.nonEmpty) {
 
             val nrecords = records.length
@@ -323,7 +324,7 @@ trait Profiler extends Values {
      * Summarise attribute evaluations along a list of dimensions.
      */
     def summariseAlongDims (dimensionNames : Seq[Dimension], records : List[Record],
-                            nrecords : Int, profiledTime : Long) {
+                            nrecords : Int, profiledTime : Long) : Unit = {
 
         import java.util.IdentityHashMap
 
@@ -488,7 +489,7 @@ trait Profiler extends Values {
         /**
          * Print an aggregated table given a list of its data.
          */
-        def printtable (buckets : Buckets) {
+        def printtable (buckets : Buckets) : Unit = {
             if (includeTimings) {
                 outputln ("%6s%6s%6s%6s%6s%6s%6s%6s".format (
                    "Total", "Total", "Self", "Self", "Desc", "Desc", "Count", "Count"
@@ -533,7 +534,7 @@ trait Profiler extends Values {
         }
 
         def aggregateAndPrintAll (dimcount : Int, dimensionNames : Seq[Dimension],
-                                  records : List[Record], value : String = "") {
+                                  records : List[Record], value : String = "") : Unit = {
             val dimension = dimensionNames.head
             val buckets = aggregateAndPrint (dimension, records, value)
             if (dimcount > 1)

@@ -26,7 +26,7 @@ package org.bitbucket.inkytonik.dsprofile
  */
 class ActionFunction (action : Action) extends Function0[Unit] {
 
-    def apply () {
+    def apply () : Unit = {
         action.execute ()
     }
 

@@ -34,8 +34,8 @@ class ProfilerTests extends Profiler
     import scala.collection.immutable.Seq
 
     var otp = ""
-    override def output (str : String) {otp = otp + str}
-    override def outputln (str : String) {otp = otp + str + "\n"}
+    override def output (str : String) : Unit = {otp = otp + str}
+    override def outputln (str : String) : Unit = {otp = otp + str + "\n"}
 
     val countShouldBe = colShouldBe (6) _
     val totalShouldBe = colShouldBe (0) _
@@ -43,13 +43,12 @@ class ProfilerTests extends Profiler
     // FIXME: Can't make use of default parameter, compiler complains for reasons I don't understand.
     // FIXME: I think it's because you can't have default param values on functions, just methods
     def colShouldBe (col : Int) (num : Int, dim : String, inp : String, within : Double = 0.0) = {
-        import scala.collection.JavaConversions._
         val lines = inp.split ("\n")
         lines.foreach { l =>
             val v = l.split ("""\s+""")
             if (v.length > 8 && v (8) == dim) {
-                v (col).toDouble should be < (num + within)
-                v (col).toDouble should be > (num - within)
+                assertResult (v (col).toDouble < (num + within), "under upper bound") (true)
+                assertResult (v (col).toDouble > (num - within), "above lower bound") (true)
             }
         }
     }

@@ -120,7 +120,7 @@ trait Values {
      * method does nothing. The method is passed the dimension names that
      * have been requested so that can react to them.
      */
-    def startReport (dimensionNames : Seq[Dimension]) {
+    def startReport (dimensionNames : Seq[Dimension]) : Unit = {
         // Do nothing
     }
 
@@ -128,14 +128,14 @@ trait Values {
      * Called when the report writing is about to finish. By default this
      * method does nothing.
      */
-    def finishReport () {
+    def finishReport () : Unit = {
         // Do nothing
     }
 
     /**
      * Send string to the profile output.
      */
-    def output (str : String) {
+    def output (str : String) : Unit = {
         System.err.print (str)
     }
 
@@ -143,7 +143,7 @@ trait Values {
      * Send string and a newline to the profile output. Default: print an
      * empty line.
      */
-    def outputln (str : String = "") {
+    def outputln (str : String = "") : Unit = {
         System.err.println (str)
     }
 

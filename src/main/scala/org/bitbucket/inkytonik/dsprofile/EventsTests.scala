@@ -40,12 +40,12 @@ class EventsTests extends FunSuiteLike with BeforeAndAfter {
     }
 
     test ("length is two") {
-        assertResult (2) {Events.events.result ().length}
+        assertResult (2) {Events.events.length}
     }
 
     test ("length after reset") {
         Events.reset
-        assertResult (0) {Events.events.result ().length}
+        assertResult (0) {Events.events.length}
     }
 
     test ("test event ids are unique") {
@@ -56,13 +56,13 @@ class EventsTests extends FunSuiteLike with BeforeAndAfter {
     }
 
     test ("wrapper interface") {
-        def do_it () {
+        def do_it () : Unit = {
             val i = 1
         }
         Events.profiling = true
         Events.wrap (Seq ("one" -> 10, "two" -> 20)) {do_it}
         Events.profiling = false
-        assertResult (4) {Events.events.result.length}
+        assertResult (4) {Events.events.length}
     }
 
 }
