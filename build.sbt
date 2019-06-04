@@ -11,7 +11,7 @@ organization := "org.bitbucket.inkytonik.dsprofile"
 
 scalaVersion := "2.12.8"
 
-crossScalaVersions := Seq ("2.12.8", "2.13.0-RC2")
+crossScalaVersions := Seq ("2.12.8", "2.13.0-RC3")
 
 scalacOptions := Seq ("-deprecation", "-unchecked")
 
@@ -47,7 +47,7 @@ shellPrompt := {
 // Dependencies
 
 libraryDependencies ++= Seq (
-    "org.scalatest" %% "scalatest" % "3.0.8-RC4" % "test"
+    "org.scalatest" %% "scalatest" % "3.0.8-RC5" % "test"
 )
 
 // No main class since dsprofile is a library
