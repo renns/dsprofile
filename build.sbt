@@ -3,7 +3,7 @@ name := "dsprofile"
 
 // Main settings
 
-version := "0.4.0"
+version := "0.4.0-a8"
 
 organization := "org.bitbucket.inkytonik.dsprofile"
 
@@ -12,6 +12,9 @@ organization := "org.bitbucket.inkytonik.dsprofile"
 scalaVersion := "2.12.8"
 
 crossScalaVersions := Seq ("2.12.8", "2.13.0")
+
+val scalaJSVersionOpt = Option(System.getProperty("scalaJSVersion"))
+enablePlugins(scalaJSVersionOpt.map(_ => ScalaJSPlugin).toSeq: _*)
 
 scalacOptions := Seq ("-deprecation", "-unchecked")
 
@@ -80,13 +83,15 @@ scalacOptions in (Compile, doc) ++=
 
 // Publishing
 
-publishTo := {
-    val nexus = "https://oss.sonatype.org/"
-    if (version.value.trim.endsWith ("SNAPSHOT"))
-        Some ("snapshots" at nexus + "content/repositories/snapshots")
-    else
-        Some ("releases" at nexus + "service/local/staging/deploy/maven2")
-}
+//publishTo := {
+//    val nexus = "https://oss.sonatype.org/"
+//    if (version.value.trim.endsWith ("SNAPSHOT"))
+//        Some ("snapshots" at nexus + "content/repositories/snapshots")
+//    else
+//        Some ("releases" at nexus + "service/local/staging/deploy/maven2")
+//}
+publishTo := Some("Accur8 Repo" at "https://locus-beta.accur8.io/repos/releases")
+credentials += Credentials(Path.userHome / ".sbt" / "credentials")
 
 publishMavenStyle := true
 
